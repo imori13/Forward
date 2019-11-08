@@ -54,9 +54,12 @@
     <Compile Include="Devices\MyMath.cs" />
     <Compile Include="Devices\Particles\ExplosionParticle2D.cs" />
     <Compile Include="Devices\Particles\FallParticle2D.cs" />
-    <Compile Include="Devices\Particles\KillerTrajectory_Particle.cs" />
+    <Compile Include="Devices\Particles\KillerTrajectory_Particle2D.cs" />
+    <Compile Include="Devices\Particles\Particle.cs" />
     <Compile Include="Devices\Particles\Particle2D.cs" />
+    <Compile Include="Devices\Particles\Particle3D.cs" />
     <Compile Include="Devices\Particles\RadiationParticle2D.cs" />
+    <Compile Include="Devices\Particles\Spark_Particle3D.cs" />
     <Compile Include="Devices\Renderer.cs" />
     <Compile Include="Devices\Screen.cs" />
     <Compile Include="Devices\Sound.cs" />

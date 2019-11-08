@@ -16,10 +16,10 @@ namespace Nov2019.GameObjects
         public List<GameObject>[] Array = new List<GameObject>[85];
         // オブジェクトを更新する
         private List<GameObject> gameobjects = new List<GameObject>();
-        private List<Particle2D> particles = new List<Particle2D>();
+        private List<Particle> particles = new List<Particle>();
 
         private List<GameObject> addGameObjects = new List<GameObject>();
-        private List<Particle2D> addParticles = new List<Particle2D>();
+        private List<Particle> addParticles = new List<Particle>();
 
         public Camera Camera { get; private set; }
 
@@ -28,6 +28,7 @@ namespace Nov2019.GameObjects
         public float unitLength { get; private set; } = (2 * 2 * 2) / MapLength;
 
         public float objectCount { get { return gameobjects.Count; } }
+        public float particleCount { get { return particles.Count; } }
 
         public ObjectsManager(Camera camera)
         {
@@ -68,7 +69,7 @@ namespace Nov2019.GameObjects
             gameobject.Initialize();
         }
 
-        public void AddParticle(Particle2D particle)
+        public void AddParticle(Particle particle)
         {
             if (particle == null) { return; }
 
@@ -97,7 +98,7 @@ namespace Nov2019.GameObjects
 
         public void Draw(Renderer renderer)
         {
-            particles.ForEach(p => p.Draw(renderer));
+            particles.ForEach(p => p.Draw(renderer, Camera));
             gameobjects.ForEach(g => g.Draw(renderer));
 
             foreach (var g in gameobjects)

@@ -97,13 +97,14 @@ namespace Nov2019.GameObjects
         // 動いたら呼び出すように
         public void UpdateListPos()
         {
+            if (Collider == null) { return; }
+
+
             if (Position.X < 0 || Position.X >= ObjectsManager.MapLength || Position.Z < 0 || Position.Z >= ObjectsManager.MapLength)
             {
                 IsDead = true;
                 return;
             }
-
-            if (Collider == null) { return; }
 
             float length = ObjectsManager.unitLength;
             Vector3 MinPos = new Vector3(0, 0, 0);

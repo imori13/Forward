@@ -48,9 +48,9 @@ namespace Nov2019.Devices.Particles
             scale = Vector2.Lerp(initScale, Vector2.Zero, GetAliveRate());
         }
 
-        public override void Draw(Renderer renderer)
+        public override void Draw(Renderer renderer, Camera camera)
         {
-            base.Draw(renderer);
+            base.Draw(renderer, camera);
         }
     }
 }

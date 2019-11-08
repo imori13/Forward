@@ -28,7 +28,7 @@ namespace Nov2019.GameObjects
 
             color = new Color(MyMath.RandF(200, 255), MyMath.RandF(200, 255), MyMath.RandF(200, 255));
 
-            Collider = new CircleCollider(this, 1);
+            //Collider = new CircleCollider(this, 1);
 
             GameObjectTag = GameObjectTag.Cube;
         }
@@ -51,7 +51,7 @@ namespace Nov2019.GameObjects
         public override void Draw(Renderer renderer)
         {
             Matrix world =
-                Matrix.CreateScale(Vector3.One * 1) *
+                Matrix.CreateScale(Vector3.One * 0.1f) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z)) *

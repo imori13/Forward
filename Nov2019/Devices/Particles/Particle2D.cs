@@ -3,7 +3,7 @@
 namespace Nov2019.Devices.Particles
 {
     // エフェクトの基本パラメータを描いた、抽象クラス
-    abstract class Particle2D
+    abstract class Particle2D : Particle
     {
         protected string assetName; // Rendererに格納されてるDictionaryデータのKeyの名前
 
@@ -24,14 +24,13 @@ namespace Nov2019.Devices.Particles
         protected float aliveTime;  // 生成時から時間を数える変数
         protected float aliveLimit; // 生存時間。この時間だけ生きる。という意味。値が5なら、5秒たったら死ぬ
         protected float aliveRate;  // 現在経った時間と、生存時間を割ったレート。生成時は0、死亡時は1。どんどん0から1に向かう感じ
-        public bool IsDead;    // これがtrueならEffectManagerのListから削除される
 
         protected GameDevice gameDevice;
         protected float rotation_dest;    // rotation+rotation_rotateの合計値。線形補完の時に使う。
         protected float rotation_start;   // rotationの最初の値を保存。線形補完の時に使う。
 
         float frictionTime;
-        float frictionLimit=0.025f;
+        float frictionLimit = 0.025f;
 
         // 引数一番多い版。少ないやつをオーバーロードメソッドとして新しく作っちゃってもオッケー 
         // 同じ名前のメソッドでも引数が違うメソッドが書けるのがオーバーロード。
@@ -66,14 +65,14 @@ namespace Nov2019.Devices.Particles
             gameDevice = GameDevice.Instance();
         }
 
-        public virtual void Initialize()
+        public override void Initialize()
         {
             rotation_dest = rotation + rotation_speed;
             rotation_start = rotation;
         }
 
         // overrideした子クラスでは最後に呼び出す。
-        public virtual void Update()
+        public override void Update()
         {
             aliveTime += (float)gameDevice.GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;  // 時間数えてる
             aliveRate = aliveTime / aliveLimit; // レート=現在時間/生存時間  0.25=1/4 4秒のエフェクトでいま1秒なら0.25
@@ -97,7 +96,7 @@ namespace Nov2019.Devices.Particles
             position += direction * speed * Time.Speed;
         }
 
-        public virtual void Draw(Renderer renderer)
+        public override void Draw(Renderer renderer, Camera camera)
         {
             renderer.Draw2D(
                 assetName,

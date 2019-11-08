@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Nov2019.Devices;
+using Nov2019.Devices.Particles;
 using Nov2019.GameObjects;
 using Nov2019.SceneDevices;
 using Nov2019.ScenesDevice;
@@ -29,15 +31,6 @@ namespace Nov2019.Scenes
 
         public override void Initialize()
         {
-            int num = 15;
-            for (int z = -num; z < num; z++)
-            {
-                for (int x = -num; x < num; x++)
-                {
-                    ObjectsManager.AddGameObject(new Cube(new Vector3(x * 10, 0, z * 10)), true);
-                }
-            }
-
             ObjectsManager.AddGameObject(Player, true);
 
             base.Initialize();
@@ -48,6 +41,14 @@ namespace Nov2019.Scenes
             Camera.Update(Player);
 
             ObjectsManager.Update();
+
+            if (Input.GetKeyDown(Keys.G))
+            {
+                for (int i = 0; i < 100f; i++)
+                {
+                    ObjectsManager.AddParticle(new Spark_Particle3D(Vector3.Zero, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                }
+            }
 
             frameCounter.Update(GameDevice.Instance().GameTime);
 
@@ -71,9 +72,13 @@ namespace Nov2019.Scenes
             size = font.MeasureString(text);
             renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 0f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
 
-            text = "FPS値 : " + frameCounter.FPS;
+            text = "パーティクル数 : " + ObjectsManager.particleCount;
             size = font.MeasureString(text);
             renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 1f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
+
+            text = "FPS値 : " + frameCounter.FPS;
+            size = font.MeasureString(text);
+            renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 2f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
 
             renderer.End();
 

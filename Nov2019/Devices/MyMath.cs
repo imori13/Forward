@@ -28,6 +28,22 @@ namespace Nov2019.Devices
             return new Vector2((float)Math.Cos(radian), (float)Math.Sin(radian));
         }
 
+        public static Vector3 SphereVec3(float latitude, float longitude)
+        {
+            float x = (float)(Math.Cos(latitude) * Math.Cos(longitude));
+            float y = (float)(Math.Sin(latitude));
+            float z = (float)(Math.Cos(latitude) * Math.Sin(longitude));
+
+            return new Vector3(x, y, z);
+        }
+
+        public static Vector3 RandomCircleVec3()
+        {
+            Vector3 value = new Vector3(RandF(-1, 1), RandF(-1, 1), RandF(-1, 1));
+            value.Normalize();
+            return value;
+        }
+
         public static float RandF(float min, float max)
         {
             return rand.Next((int)min, (int)max) + (float)rand.NextDouble();

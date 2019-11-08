@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Nov2019.Devices;
 using Nov2019.Devices.Collision;
+using Nov2019.Devices.Particles;
 
 namespace Nov2019.GameObjects
 {

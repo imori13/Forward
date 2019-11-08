@@ -56,17 +56,19 @@ namespace Nov2019.Devices
             random = gameDevice.Random;
             gameTime = gameDevice.GameTime;
 
-            // カメラをプレイヤーの後ろに追従するように設定
-            Position = Vector3.Lerp(Position, player.Position + (-player.AngleVec3 * 15) + Vector3.Up * 8, 0.2f * Time.Speed);
 
-            View = Matrix.Lerp(View, CameraView(player.Position + player.AngleVec3 * 10), 0.1f * Time.Speed);
+            //View = Matrix.Lerp(View, CameraView(player.Position + player.AngleVec3 * 10, player), 0.1f * Time.Speed);
+            View = Matrix.Lerp(View, DebugView(), 0.1f * Time.Speed);
         }
 
         // 振動コピペURL
         // http://xnaessentials.com/post/2011/04/27/shake-that-camera.aspx
 
-        Matrix CameraView(Vector3 viewPoint)
+        Matrix CameraView(Vector3 viewPoint, Player player)
         {
+            // カメラをプレイヤーの後ろに追従するように設定
+            Position = Vector3.Lerp(Position, player.Position + (-player.AngleVec3 * 15) + Vector3.Up * 8, 0.2f * Time.Speed);
+
             if (shaking)
             {
                 shakeTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -122,7 +124,7 @@ namespace Nov2019.Devices
             if (Input.GetKey(Keys.Space)) destVelocity += up;
             if (Input.GetKey(Keys.LeftControl)) destVelocity -= up;
 
-            velocity = Vector3.Lerp(velocity, destVelocity * 0.1f, 0.25f);
+            velocity = Vector3.Lerp(velocity, destVelocity * 0.5f, 0.25f);
             Position += velocity;
 
             // ビュー行列を作成

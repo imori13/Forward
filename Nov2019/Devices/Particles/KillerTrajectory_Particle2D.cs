@@ -7,11 +7,11 @@ using Microsoft.Xna.Framework;
 
 namespace Nov2019.Devices.Particles
 {
-    class KillerTrajectory_Particle : Particle2D
+    class KillerTrajectory_Particle2D : Particle2D
     {
         Vector2 initScale;
 
-        public KillerTrajectory_Particle(
+        public KillerTrajectory_Particle2D(
             Vector2 position,
             Vector2 direction,
             Random rand)
@@ -44,9 +44,9 @@ namespace Nov2019.Devices.Particles
             scale = Vector2.Lerp(initScale, Vector2.Zero, GetAliveRate());
         }
 
-        public override void Draw(Renderer renderer)
+        public override void Draw(Renderer renderer,Camera camera)
         {
-            base.Draw(renderer);
+            base.Draw(renderer,camera);
         }
     }
 }
