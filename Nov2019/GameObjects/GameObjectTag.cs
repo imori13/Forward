@@ -10,5 +10,6 @@ namespace Nov2019.GameObjects
     {
         None,   // タグなし
         Player, // プレイヤー
+        Cube,
     }
 }

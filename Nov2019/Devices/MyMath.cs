@@ -5,6 +5,8 @@ namespace Nov2019.Devices
 {
     static class MyMath
     {
+        static Random rand = GameDevice.Instance().Random;
+
         // 度数角度をVector2に変換する
         public static Vector2 DegToVec2(float kakudo)
         {
@@ -24,6 +26,16 @@ namespace Nov2019.Devices
             float radian = MathHelper.ToRadians(rand.Next(360) + (float)rand.NextDouble());
 
             return new Vector2((float)Math.Cos(radian), (float)Math.Sin(radian));
+        }
+
+        public static float RandF(float min, float max)
+        {
+            return rand.Next((int)min, (int)max) + (float)rand.NextDouble();
+        }
+
+        public static float RandF(float max)
+        {
+            return RandF(0, max);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Nov2019.GameObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,73 +11,127 @@ namespace Nov2019.Devices
 {
     class Camera
     {
-        public Vector2 Position { get; set; }
-        public Vector2 Zoom { get; set; }
-        public float Rotation { get; set; }
+        public Vector3 Position { get; set; }
+
+        // private
+        public Matrix View { get; private set; }    // カメラの位置、見る方向を元に計算するMatrix
+        public Matrix Projection { get; private set; }  // カメラの視野範囲
+
+        private Matrix rotationX;
+        private Matrix rotationY;
+
+        private GameDevice gameDevice;
+        Random random;
+        GameTime gameTime;
+
+        float yaw;
+        float pitch;
 
         private bool shaking;
         private float shakeMagnitude;
         private float shakeDuration;
         private float shakeDelay;
         private float shakeTimer;
-        private Vector2 shakeOffset;
+        private Vector3 shakeOffset;
 
-        Random rand = GameDevice.Instance().Random;
-
-        public Matrix Matrix
-        {
-            get
-            {
-                if (shaking)
-                {
-                    shakeTimer += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
-
-                    if (shakeTimer >= shakeDuration)
-                    {
-                        shaking = false;
-                        shakeTimer = shakeDuration;
-                    }
-
-                    float progress = shakeTimer / shakeDuration;
-
-                    float magnitude = shakeMagnitude * (1f - (progress * progress));
-
-                    shakeOffset = new Vector2(NextFloat(), NextFloat()) * magnitude;
-
-                    Position += shakeOffset;
-
-                    shakeMagnitude *= shakeDelay;
-                }
-
-                Vector3 pos = new Vector3(Position, 0);
-                Vector3 screenPos = new Vector3(Screen.WIDTH / 2f, Screen.HEIGHT / 2f, 0);
-
-                return Matrix.CreateTranslation(-pos) *
-                       Matrix.CreateScale(new Vector3(Zoom, 0)) *
-                       Matrix.CreateRotationZ(MathHelper.ToRadians(Rotation)) *
-                       Matrix.CreateTranslation(screenPos);
-
-            }
-        }
+        Vector3 velocity;
 
         public Camera()
         {
-            Zoom = Vector2.One;
+            Position = Vector3.Zero;
+
+            Projection = Matrix.CreatePerspectiveFieldOfView(
+                MathHelper.PiOver4, 16F / 9F, 0.001f, 2500f);
+
+            yaw = MathHelper.ToRadians(180);
+            pitch = MathHelper.ToRadians(-5);
+
+            rotationX = Matrix.CreateRotationX(0);
+            rotationY = Matrix.CreateRotationY(0);
         }
 
-        public void Initialize()
+        public void Update(Player player)
         {
-            Position = Vector2.Zero;
+            gameDevice = GameDevice.Instance();
+            random = gameDevice.Random;
+            gameTime = gameDevice.GameTime;
+
+            // カメラをプレイヤーの後ろに追従するように設定
+            Position = Vector3.Lerp(Position, player.Position + (-player.AngleVec3 * 15) + Vector3.Up * 8, 0.2f * Time.Speed);
+
+            View = Matrix.Lerp(View, CameraView(player.Position + player.AngleVec3 * 10), 0.1f * Time.Speed);
         }
 
-        public void Update()
-        {
+        // 振動コピペURL
+        // http://xnaessentials.com/post/2011/04/27/shake-that-camera.aspx
 
+        Matrix CameraView(Vector3 viewPoint)
+        {
+            if (shaking)
+            {
+                shakeTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (shakeTimer >= shakeDuration)
+                {
+                    shaking = false;
+                    shakeTimer = shakeDuration;
+                }
+
+                float progress = shakeTimer / shakeDuration;
+
+                float magnitude = shakeMagnitude * (1f - (progress * progress));
+
+                shakeOffset = new Vector3(NextFloat(), NextFloat(), NextFloat()) * magnitude;
+
+                Position += shakeOffset;
+                viewPoint += shakeOffset;
+
+                shakeMagnitude *= shakeDelay;
+            }
+
+            // プレイヤーの方向をカメラが向く
+            Matrix matrix = Matrix.CreateLookAt(Position, viewPoint, Vector3.Up);
+
+            return matrix;
+        }
+
+        Matrix DebugView()
+        {
+            // マウスを画面の中心に置く
+            Input.SetMousePosition(Screen.WIDTH / 2, Screen.HEIGHT / 2);
+
+
+            // マウスが画面中央からどれだけ移動したかを取得し、値を変化させる
+            // YawはY軸を中心とした横回転
+
+            yaw -= (Input.GetMousePosition().X - Screen.WIDTH / 2) / 1000f; // ÷1000はマウスの速度 
+            pitch -= (Input.GetMousePosition().Y - Screen.HEIGHT / 2) / 1000f; // PitchはX軸を中心とした縦回転
+
+            // YawとPitchから前方の座標と左側、上側の座標を取得
+            Vector3 forward = Vector3.TransformNormal(Vector3.Forward, Matrix.CreateFromYawPitchRoll(yaw, pitch, 0));
+            Vector3 left = Vector3.TransformNormal(Vector3.Left, Matrix.CreateFromYawPitchRoll(yaw, pitch, 0));
+            Vector3 up = Vector3.TransformNormal(Vector3.Up, Matrix.CreateFromYawPitchRoll(yaw, pitch, 0));
+
+            Vector3 destVelocity = Vector3.Zero;
+
+            // キー入力
+            if (Input.GetKey(Keys.W)) destVelocity += forward;
+            if (Input.GetKey(Keys.S)) destVelocity -= forward;
+            if (Input.GetKey(Keys.A)) destVelocity += left;
+            if (Input.GetKey(Keys.D)) destVelocity -= left;
+            if (Input.GetKey(Keys.Space)) destVelocity += up;
+            if (Input.GetKey(Keys.LeftControl)) destVelocity -= up;
+
+            velocity = Vector3.Lerp(velocity, destVelocity * 0.1f, 0.25f);
+            Position += velocity;
+
+            // ビュー行列を作成
+            return Matrix.CreateLookAt(Position, Position + forward, up);
         }
 
         private float NextFloat()
         {
-            return (float)rand.NextDouble() * 2f - 1f;
+            return (float)random.NextDouble() * 2f - 1f;
         }
 
         public void Shake(float magnitude, float duration, float delay)

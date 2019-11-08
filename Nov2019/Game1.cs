@@ -16,6 +16,7 @@ namespace Nov2019
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.GraphicsProfile = GraphicsProfile.HiDef;
             Content.RootDirectory = "Content";
 
             // フルスクリーンのオンオフを設定
@@ -35,13 +36,15 @@ namespace Nov2019
         protected override void Initialize()
         {
             GameDevice.Instance(GraphicsDevice, Content);
-            TimeSpeed.Initialize();
+            Time.Initialize();
 
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+            Fonts.LoadFonts(Content);
+
             renderer = GameDevice.Instance().Renderer;
 
             Texture2D Pixel = new Texture2D(GraphicsDevice, 1, 1);
@@ -50,6 +53,12 @@ namespace Nov2019
             Pixel.SetData(color);
             renderer.LoadTexture("Pixel", Pixel);
             renderer.LoadTexture("slowMode", "Textures/");
+
+            renderer.Load3D("boat", "Models/");
+            renderer.Load3D("cube", "Models/");
+            renderer.Load3D("LowSphere", "Models/");
+
+            renderer.LoadTexture("boat_red", "ModelTextures/");
 
             Sound sound = GameDevice.Instance().Sound;
 
@@ -70,7 +79,7 @@ namespace Nov2019
                 Exit();
 
             GameDevice.Instance().Update(gameTime);
-            TimeSpeed.Update();
+            Time.Update();
             Screen.Update(graphics, Window);
 
             sceneManager.Update();
@@ -85,7 +94,7 @@ namespace Nov2019
             sceneManager.Draw(renderer);
 
             renderer.Begin();
-            TimeSpeed.Draw(renderer);
+            Time.Draw(renderer);
             renderer.End();
 
             base.Draw(gameTime);

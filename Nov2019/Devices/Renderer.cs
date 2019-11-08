@@ -14,11 +14,21 @@ namespace Nov2019.Devices
     {
         public GraphicsDevice GraphicsDevice { get; private set; }
         public ContentManager ContentManager { get; private set; }
+        // 描画用クラス
+        private SpriteBatch spriteBatch;
 
         // テクスチャを格納
         private Dictionary<string, Texture2D> textures;
-        // 描画用クラス
-        private SpriteBatch spriteBatch;
+        // 3Dデータ
+        private Dictionary<string, Model> models = new Dictionary<string, Model>();
+
+        // カメラ描画情報
+        private float fogS = 200;
+        private float fogE = 700;
+        private Color fogColor = Color.LightSkyBlue;
+        private Vector3 AmbientLightColor = Vector3.One * 0.5f;
+        private Vector3 EmissiveColor = Vector3.One * 0.25f;
+        private Vector3 SpecularColor = Vector3.One * 1f;
 
         // コンストラクタ
         public Renderer(GraphicsDevice graphicsDevice, ContentManager contentManager)
@@ -33,39 +43,29 @@ namespace Nov2019.Devices
         // 描画開始
         public void Begin()
         {
-            spriteBatch.Begin();
-        }
-
-        // 描画順をレイヤーごとにわけるBegin
-        public void BeginCloud(Camera camera)
-        {
-            spriteBatch.Begin(
-                     SpriteSortMode.FrontToBack,
-                     BlendState.AlphaBlend,
-                     SamplerState.LinearClamp,
-                     DepthStencilState.None,
-                     RasterizerState.CullCounterClockwise,
-                     null,
-                     camera.Matrix);
-        }
-
-        // 描画開始
-        public void Begin(Camera camera)
-        {
             spriteBatch.Begin(
                   SpriteSortMode.Deferred,
                   BlendState.AlphaBlend,
                   SamplerState.LinearClamp,
-                  DepthStencilState.None,
+                  DepthStencilState.Default,
                   RasterizerState.CullCounterClockwise,
                   null,
-                  camera.Matrix);
+                  null);
         }
 
         // 描画終了
         public void End()
         {
             spriteBatch.End();
+        }
+
+        // 3Dデータの読み込み
+        public void Load3D(string assetName, string filepath = "./")
+        {
+            Debug.Assert(ContentManager != null, "ModelRendererのContentManagerがnullです！");
+            Debug.Assert(!models.ContainsKey(assetName), "すでにモデル" + assetName + "が読み込まれています");
+
+            models.Add(assetName, ContentManager.Load<Model>(filepath + assetName));
         }
 
         // テクスチャをロード
@@ -129,6 +129,85 @@ namespace Nov2019.Devices
         public void DrawString(SpriteFont font, string text, Vector2 position, Color color, float rotation, Vector2 origin, Vector2 scale)
         {
             spriteBatch.DrawString(font, text, position, color, rotation, origin, scale, SpriteEffects.None, 0);
+        }
+
+        // テクスチャを指定してModelに貼る。描画処理
+        public void Draw3D(string modelName, string modelTexture, Camera camera, Matrix world)
+        {
+            Debug.Assert(models.ContainsKey(modelName), "指定したAssetName[" + modelName + " ]または[ " + modelTexture + " ]がロードされていません。");
+
+            foreach (ModelMesh mesh in models[modelName].Meshes)
+            {
+                foreach (BasicEffect effect in mesh.Effects)
+                {
+                    effect.LightingEnabled = true;
+                    effect.DirectionalLight0.Enabled = true;
+                    effect.DirectionalLight0.Direction = new Vector3(0.1f, -0.5f, 1);
+                    effect.DirectionalLight0.DiffuseColor = new Vector3(1, 1, 1);
+                    effect.DirectionalLight0.SpecularColor = Color.White.ToVector3();
+                    effect.AmbientLightColor = AmbientLightColor;
+                    effect.EmissiveColor = EmissiveColor;
+                    effect.SpecularColor = SpecularColor;
+
+                    effect.World = world;
+                    effect.View = camera.View;
+                    effect.Projection = camera.Projection;
+
+                    effect.FogEnabled = true;
+                    effect.FogStart = fogS;
+                    effect.FogEnd = fogE;
+                    effect.FogColor = fogColor.ToVector3();
+
+                    if (modelTexture != null && modelTexture != "")
+                    {
+                        Debug.Assert(textures.ContainsKey(modelTexture), "指定したModelTexture[ " + modelTexture + " ]が存在しません");
+
+                        effect.DiffuseColor = Color.White.ToVector3();
+                        effect.TextureEnabled = true;
+                        effect.Texture = textures[modelTexture];
+                    }
+                }
+
+                mesh.Draw();
+            }
+        }
+
+        // 色を指定してモデルに色を塗る。描画処理
+        public void Draw3D(string modelName, Color color, Camera camera, Matrix world)
+        {
+            Debug.Assert(models.ContainsKey(modelName), "指定したAssetName[" + modelName + " ]がロードされていません。");
+
+            foreach (ModelMesh mesh in models[modelName].Meshes)
+            {
+                foreach (BasicEffect effect in mesh.Effects)
+                {
+                    effect.LightingEnabled = true;
+                    effect.EnableDefaultLighting();
+                    effect.DirectionalLight0.Enabled = true;
+                    effect.DirectionalLight0.Direction = new Vector3(0.1f, -0.5f, 1);
+                    effect.DirectionalLight0.DiffuseColor = new Vector3(1, 1, 1);
+                    effect.DirectionalLight0.SpecularColor = Color.White.ToVector3();
+                    effect.AmbientLightColor = AmbientLightColor;
+                    effect.EmissiveColor = EmissiveColor;
+                    effect.SpecularColor = SpecularColor;
+
+                    effect.World = world;
+                    effect.View = camera.View;
+                    effect.Projection = camera.Projection;
+
+                    effect.FogEnabled = true;
+                    effect.FogStart = fogS;
+                    effect.FogEnd = fogE;
+                    effect.FogColor = fogColor.ToVector3();
+
+                    if (color != null)
+                    {
+                        effect.Alpha = color.A / 255f;
+                        effect.DiffuseColor = color.ToVector3();
+                    }
+                }
+                mesh.Draw();
+            }
         }
     }
 }

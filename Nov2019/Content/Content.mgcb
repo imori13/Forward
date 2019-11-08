@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:WpfFontPipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -24,4 +25,117 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/slowMode.png
+
+#begin Models/LowSphere.obj
+/importer:OpenAssetImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Models/LowSphere.obj
+
+#begin Models/cube.obj
+/importer:OpenAssetImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Models/cube.obj
+
+#begin Models/boat.obj
+/importer:OpenAssetImporter
+/processor:ModelProcessor
+/processorParam:ColorKeyColor=0,0,0,0
+/processorParam:ColorKeyEnabled=True
+/processorParam:DefaultEffect=BasicEffect
+/processorParam:GenerateMipmaps=True
+/processorParam:GenerateTangentFrames=False
+/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyVertexColors=True
+/processorParam:ResizeTexturesToPowerOfTwo=False
+/processorParam:RotationX=0
+/processorParam:RotationY=0
+/processorParam:RotationZ=0
+/processorParam:Scale=1
+/processorParam:SwapWindingOrder=False
+/processorParam:TextureFormat=Compressed
+/build:Models/boat.obj
+
+#begin ModelTextures/boat_red.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ModelTextures/boat_red.png
+
+#begin Fonts/pixelMplus10_size128.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/pixelMplus10_size128.spritefont
+
+#begin Fonts/pixelMplus10_size256.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/pixelMplus10_size256.spritefont
+
+#begin Fonts/pixelMplus12_size32.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/pixelMplus12_size32.spritefont
+
+#begin Fonts/cica_size32.spritefont
+/importer:FontDescriptionImporter
+/processor:WpfFontDescriptionProcessor
+/processorParam:HasAsciiCharacters=True
+/processorParam:HasZenkakuLatinLetters=True
+/processorParam:HasSpecialCharacters=True
+/processorParam:HasHiragana=True
+/processorParam:HasKatakana=True
+/processorParam:HasJisKanjiLevel1=True
+/processorParam:HasJisKanjiLevel2=True
+/processorParam:HasGreekLetters=True
+/processorParam:HasCyrillicLetters=True
+/processorParam:HasBoxCharacters=True
+/processorParam:OutlineThickness=0
+/processorParam:OutlineColor=64,64,64,255
+/processorParam:FontColor=255,255,255,255
+/processorParam:UseGradient=False
+/processorParam:GradientBeginColor=64,128,255,255
+/processorParam:GradientEndColor=0,0,128,255
+/processorParam:GradientAngle=90
+/processorParam:TextureFormat=Auto
+/build:Fonts/cica_size32.spritefont
 

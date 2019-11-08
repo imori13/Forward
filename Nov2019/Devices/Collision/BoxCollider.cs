@@ -12,9 +12,9 @@ namespace Nov2019.Devices.Collision
     class BoxCollider : Collider
     {
         // 中心からのX,Y,Zの距離
-        public Vector2 Size { get; private set; }
+        public Vector3 Size { get; private set; }
 
-        public BoxCollider(GameObject gameobject, Vector2 size)
+        public BoxCollider(GameObject gameobject, Vector3 size)
             : base(gameobject, ColliderEnum.Box)
         {
             Size = size;
@@ -37,7 +37,9 @@ namespace Nov2019.Devices.Collision
             if (gameobject.Position.X - Size.X / 2f < collider.gameobject.Position.X + collider.Size.X / 2f &&
                 gameobject.Position.X + Size.X / 2f > collider.gameobject.Position.X - collider.Size.X / 2f &&
                 gameobject.Position.Y - Size.Y / 2f < collider.gameobject.Position.Y + collider.Size.Y / 2f &&
-                gameobject.Position.Y + Size.Y / 2f > collider.gameobject.Position.Y - collider.Size.Y / 2f)
+                gameobject.Position.Y + Size.Y / 2f > collider.gameobject.Position.Y - collider.Size.Y / 2f &&
+                gameobject.Position.Z - Size.Z / 2f < collider.gameobject.Position.Z + collider.Size.Z / 2f &&
+                gameobject.Position.Z + Size.Z / 2f > collider.gameobject.Position.Z - collider.Size.Z / 2f)
             {
                 return true;
             }
@@ -48,9 +50,9 @@ namespace Nov2019.Devices.Collision
         // BoxとCircle
         public bool CircleCollision(CircleCollider collider)
         {
-            Vector2 nearPoint = Vector2.Clamp(collider.gameobject.Position, gameobject.Position - Size, gameobject.Position + Size);
+            Vector3 nearPoint = Vector3.Clamp(collider.gameobject.Position, gameobject.Position - Size, gameobject.Position + Size);
 
-            if (Vector2.DistanceSquared(nearPoint, collider.gameobject.Position) < (collider.Radius * collider.Radius))
+            if (Vector3.DistanceSquared(nearPoint, collider.gameobject.Position) < (collider.Radius * collider.Radius))
             {
                 return true;
             }
@@ -60,17 +62,17 @@ namespace Nov2019.Devices.Collision
 
         public override void Draw(Renderer renderer)
         {
-            Vector2 p1, p2, p3, p4;
-            p1 = gameobject.Position + new Vector2(-Size.X/2f, -Size.Y / 2f);
-            p2 = gameobject.Position + new Vector2(Size.X / 2f, -Size.Y / 2f);
-            p3 = gameobject.Position + new Vector2(-Size.X / 2f, Size.Y / 2f);
-            p4 = gameobject.Position + new Vector2(Size.X / 2f, Size.Y / 2f);
+            //Vector2 p1, p2, p3, p4;
+            //p1 = gameobject.Position + new Vector2(-Size.X / 2f, -Size.Y / 2f);
+            //p2 = gameobject.Position + new Vector2(Size.X / 2f, -Size.Y / 2f);
+            //p3 = gameobject.Position + new Vector2(-Size.X / 2f, Size.Y / 2f);
+            //p4 = gameobject.Position + new Vector2(Size.X / 2f, Size.Y / 2f);
 
-            float width = 1;
-            renderer.Draw2D("Pixel", gameobject.Position + new Vector2(0, -Size.Y / 2f), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(p2.X - p1.X, width));
-            renderer.Draw2D("Pixel", gameobject.Position + new Vector2(Size.X / 2f, 0), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(width, p3.Y - p2.Y));
-            renderer.Draw2D("Pixel", gameobject.Position + new Vector2(0, Size.Y / 2f), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(p4.X - p3.X, width));
-            renderer.Draw2D("Pixel", gameobject.Position + new Vector2(-Size.X / 2f, 0), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(width, p4.Y - p1.Y));
+            //float width = 1;
+            //renderer.Draw2D("Pixel", gameobject.Position + new Vector2(0, -Size.Y / 2f), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(p2.X - p1.X, width));
+            //renderer.Draw2D("Pixel", gameobject.Position + new Vector2(Size.X / 2f, 0), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(width, p3.Y - p2.Y));
+            //renderer.Draw2D("Pixel", gameobject.Position + new Vector2(0, Size.Y / 2f), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(p4.X - p3.X, width));
+            //renderer.Draw2D("Pixel", gameobject.Position + new Vector2(-Size.X / 2f, 0), Color.LightGreen, 0, Vector2.One / 2f, new Vector2(width, p4.Y - p1.Y));
         }
     }
 }
