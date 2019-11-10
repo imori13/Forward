@@ -88,7 +88,15 @@ namespace Nov2019.GameObjects
             gameobjects.AddRange(addGameObjects);
 
             addGameObjects.Clear();
-            gameobjects.ForEach(g => g.Update());
+
+            gameobjects.ForEach(g =>
+            {
+                if (Vector3.DistanceSquared(Player.Position, g.Position) <= 500f * 500f)
+                {
+                    g.Update();
+                }
+            });
+
             particles.ForEach(p => p.Update());
 
             CollisionCheck();
