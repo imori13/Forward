@@ -27,6 +27,11 @@ namespace Nov2019.Devices
         float yaw;
         float pitch;
 
+        float cameraPosLatitude = 0;
+        float destCameraPosLatitude;
+        float cameraPosLongitude = 0;
+        float destCameraPosLongitude;
+
         private bool shaking;
         private float shakeMagnitude;
         private float shakeDuration;
@@ -41,13 +46,15 @@ namespace Nov2019.Devices
             Position = Vector3.Zero;
 
             Projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.PiOver4, 16F / 9F, 0.001f, 2500f);
+                MathHelper.PiOver4, 16F / 9F, 0.001f, 100000f);
 
             yaw = MathHelper.ToRadians(180);
             pitch = MathHelper.ToRadians(-5);
 
             rotationX = Matrix.CreateRotationX(0);
             rotationY = Matrix.CreateRotationY(0);
+
+            cameraPosLongitude = 0;
         }
 
         public void Update(Player player)
@@ -56,18 +63,43 @@ namespace Nov2019.Devices
             random = gameDevice.Random;
             gameTime = gameDevice.GameTime;
 
+            View = CameraView(player);
+            //View = Matrix.Lerp(View, DebugView(), 0.1f * Time.Speed);
 
-            //View = Matrix.Lerp(View, CameraView(player.Position + player.AngleVec3 * 10, player), 0.1f * Time.Speed);
-            View = Matrix.Lerp(View, DebugView(), 0.1f * Time.Speed);
+            // マウスを画面の中心に置く
+            Input.SetMousePosition(Screen.WIDTH / 2, Screen.HEIGHT / 2);
         }
 
         // 振動コピペURL
         // http://xnaessentials.com/post/2011/04/27/shake-that-camera.aspx
 
-        Matrix CameraView(Vector3 viewPoint, Player player)
+        Matrix CameraView(Player player)
         {
+            destCameraPosLatitude += (Input.GetMousePosition().Y - Screen.HEIGHT / 2f) * 0.5f;
+            destCameraPosLatitude = MathHelper.Clamp(destCameraPosLatitude, -15, 15);
+
+            destCameraPosLongitude += (Input.GetMousePosition().X - Screen.WIDTH / 2f) * 0.5f;
+
+            cameraPosLatitude = MathHelper.Lerp(cameraPosLatitude, destCameraPosLatitude, 1);
+            cameraPosLongitude = MathHelper.Lerp(cameraPosLongitude, destCameraPosLongitude, 1);
+
             // カメラをプレイヤーの後ろに追従するように設定
-            Position = Vector3.Lerp(Position, player.Position + (-player.AngleVec3 * 15) + Vector3.Up * 8, 0.2f * Time.Speed);
+            Vector3 cameraPosAngleVec3 =
+                new Vector3(
+                    (float)Math.Cos(MathHelper.ToRadians(cameraPosLongitude)),
+                    (float)Math.Sin(MathHelper.ToRadians(cameraPosLatitude)),
+                    (float)Math.Sin(MathHelper.ToRadians(cameraPosLongitude)));
+
+            if (Input.IsRightMouseHold())
+            {
+                Position = Vector3.Lerp(Position, player.Position + Vector3.Up * 10 - player.AngleVec3 * 50f, 0.2f * Time.Speed);
+            }
+            else
+            {
+                Position = Vector3.Lerp(Position, player.Position + Vector3.Up * 15 + cameraPosAngleVec3 * 50f, 0.2f * Time.Speed);
+            }
+
+            Vector3 viewPoint = player.Position + player.AngleVec3 * 1f;
 
             if (shaking)
             {
@@ -92,17 +124,13 @@ namespace Nov2019.Devices
             }
 
             // プレイヤーの方向をカメラが向く
-            Matrix matrix = Matrix.CreateLookAt(Position, viewPoint, Vector3.Up);
+            Matrix matrix = Matrix.Lerp(View, Matrix.CreateLookAt(Position, viewPoint, Vector3.Up), 1 * Time.Speed);
 
             return matrix;
         }
 
         Matrix DebugView()
         {
-            // マウスを画面の中心に置く
-            Input.SetMousePosition(Screen.WIDTH / 2, Screen.HEIGHT / 2);
-
-
             // マウスが画面中央からどれだけ移動したかを取得し、値を変化させる
             // YawはY軸を中心とした横回転
 
@@ -128,7 +156,7 @@ namespace Nov2019.Devices
             Position += velocity;
 
             // ビュー行列を作成
-            return Matrix.CreateLookAt(Position, Position + forward, up);
+            return Matrix.Lerp(View, Matrix.CreateLookAt(Position, Position + forward, up), 0.1f * Time.Speed);
         }
 
         private float NextFloat()

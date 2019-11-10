@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Nov2019.Devices;
+
+namespace Nov2019.GameObjects
+{
+    class PlayerBullet : GameObject
+    {
+        Vector3 direction;
+        float speed;
+
+        public PlayerBullet(Vector3 Position, Vector3 direction)
+        {
+            this.Position = Position;
+            this.direction = direction;
+
+        }
+
+        public override void Initialize()
+        {
+            speed = 20;
+
+            Vector2 distance = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(direction.Z, direction.X)) + MyMath.RandF(-1, 1));
+            direction += new Vector3(distance.Y, 0, distance.X);
+
+            if (direction.Length() == 0)
+            {
+                IsDead = true;
+            }
+            else
+            {
+                direction.Normalize();
+            }
+        }
+
+        public override void Update()
+        {
+            Velocity = direction * speed;
+
+            Position += Velocity * Time.Speed;
+        }
+
+        public override void Draw(Renderer renderer)
+        {
+            // 描画
+            Matrix world =
+                Matrix.CreateScale(new Vector3(0.1f, 0.1f, 1f)) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(MyMath.Vec2ToDeg(new Vector2(direction.Z, direction.X)))) *
+                Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
+                Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
+
+            renderer.Draw3D("cube", Color.Yellow, Camera, world);
+        }
+
+        public override void DrawUI(Renderer renderer)
+        {
+
+        }
+
+        public override void HitAction(GameObject gameObject)
+        {
+
+        }
+    }
+}

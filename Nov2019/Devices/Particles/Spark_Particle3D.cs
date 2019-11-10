@@ -21,9 +21,9 @@ namespace Nov2019.Devices.Particles
                 MyMath.RandF(1, 2) * 0.25f,
                 position,
                 direction,
-                MyMath.RandF(10, 100) * 0.001f,  // speed
+                MyMath.RandF(10, 30) * 0.001f,  // speed
                 0.9f,   // friction
-                Vector3.One * MyMath.RandF(1, 10) * 0.1f,  // scale
+                Vector3.One * MyMath.RandF(5, 10) * 0.1f,  // scale
                 Vector3.Zero,   // rotation
                 Vector3.Zero,  // rotationspeed
                 new Vector3(0.5f, 0.5f, 1.0f)  // origin
@@ -36,28 +36,33 @@ namespace Nov2019.Devices.Particles
         {
             base.Initialize();
 
-            initscale = scale;
-
+            initscale = new Vector3(speed, speed * 0.1f, speed * 0.1f);
         }
 
         public override void Update()
         {
             base.Update();
 
-            scale = Vector3.Lerp(initscale, Vector3.Zero, aliveRate);
-            scale.Z = speed;
+            scale = Vector3.Lerp(initscale, new Vector3(speed, speed * 0.1f, speed * 0.1f), aliveRate);
         }
         public override void Draw(Renderer renderer, Camera camera)
         {
+            // 回転軸は外積で計算できる
+            var cross = Vector3.Cross(Vector3.Right, direction);
 
-            float latitude = (float)Math.Atan2(direction.X,direction.Y);
-            float longitude = (float)Math.Atan2(direction.X, direction.Z);
+            // 内積の公式
+            // dot = |V1||V2|cosθ
+            // ここでV1とV2が正規化されているなら（＝長さ１）なら
+            // dot = cosθ
+            direction.Normalize();
+            var dot = Vector3.Dot(Vector3.Right, direction);
+
+            // cosθが分かったのでAcosで角度を計算
+            var rad = Math.Acos(dot);
 
             Matrix world =
                 Matrix.CreateScale(scale) *
-                Matrix.CreateRotationX(0) *
-                Matrix.CreateRotationY(longitude) *
-                Matrix.CreateRotationZ(0) *
+                Matrix.CreateFromAxisAngle(cross, (float)rad) *
                 Matrix.CreateWorld(position + origin, Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D(

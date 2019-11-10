@@ -44,6 +44,11 @@ namespace Nov2019.Devices
             return value;
         }
 
+        public static Vector3 RandomBoxVec3()
+        {
+            return new Vector3(RandF(-1, 1), RandF(-1, 1), RandF(-1, 1));
+        }
+
         public static float RandF(float min, float max)
         {
             return rand.Next((int)min, (int)max) + (float)rand.NextDouble();

@@ -59,6 +59,7 @@
     <Compile Include="Devices\Particles\Particle2D.cs" />
     <Compile Include="Devices\Particles\Particle3D.cs" />
     <Compile Include="Devices\Particles\RadiationParticle2D.cs" />
+    <Compile Include="Devices\Particles\RocketFire_Particle3D.cs" />
     <Compile Include="Devices\Particles\Spark_Particle3D.cs" />
     <Compile Include="Devices\Renderer.cs" />
     <Compile Include="Devices\Screen.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="GameObjects\GameObjectTag.cs" />
     <Compile Include="GameObjects\ObjectsManager.cs" />
     <Compile Include="GameObjects\Player.cs" />
+    <Compile Include="GameObjects\PlayerBullet.cs" />
     <Compile Include="GameObjects\Wall.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

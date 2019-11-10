@@ -22,13 +22,19 @@ namespace Nov2019.Devices
 
         public void Update(GameTime gameTime)
         {
-            timer += gameTime.ElapsedGameTime.TotalSeconds;
+            // フレーム数を増やす（目標は１秒に６０回）
             counter++;
 
-            while (timer > interval)
+            // タイマーに前のフレームから過ぎた時間を加算する
+            timer += gameTime.ElapsedGameTime.TotalSeconds;
+
+            // タイマーが1秒を超えたら
+            if (timer > interval)
             {
+                // FPSを計算する, 速度が下がっていた場合はここで差を計算する
                 FPS = counter / timer;
 
+                // タイマーとカウンターをリセットする
                 counter = 0;
                 timer -= interval;
             }

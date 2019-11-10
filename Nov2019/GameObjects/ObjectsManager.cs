@@ -22,6 +22,7 @@ namespace Nov2019.GameObjects
         private List<Particle> addParticles = new List<Particle>();
 
         public Camera Camera { get; private set; }
+        public Player Player { get; private set; }
 
         public static readonly float MapLength = 2000f;
         // 分割数 / ルート空間の長さ
@@ -67,6 +68,11 @@ namespace Nov2019.GameObjects
             addGameObjects.Add(gameobject);
 
             gameobject.Initialize();
+
+            if (gameobject is Player)
+            {
+                Player = gameobject as Player;
+            }
         }
 
         public void AddParticle(Particle particle)

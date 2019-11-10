@@ -31,6 +31,13 @@ namespace Nov2019.Scenes
 
         public override void Initialize()
         {
+            float distance = 1000f;
+
+            for (int i = 0; i < 10000f; i++)
+            {
+                ObjectsManager.AddGameObject(new Cube(new Vector3(MyMath.RandF(-distance, distance), MyMath.RandF(-distance, distance), MyMath.RandF(-distance, distance))), true);
+            }
+
             ObjectsManager.AddGameObject(Player, true);
 
             base.Initialize();
@@ -42,14 +49,6 @@ namespace Nov2019.Scenes
 
             ObjectsManager.Update();
 
-            if (Input.GetKeyDown(Keys.G))
-            {
-                for (int i = 0; i < 100f; i++)
-                {
-                    ObjectsManager.AddParticle(new Spark_Particle3D(Vector3.Zero, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
-                }
-            }
-
             frameCounter.Update(GameDevice.Instance().GameTime);
 
             base.Update();
@@ -57,6 +56,7 @@ namespace Nov2019.Scenes
 
         public override void Draw(Renderer renderer)
         {
+
             renderer.Begin();
             ObjectsManager.Draw(renderer);
             renderer.End();
@@ -76,7 +76,7 @@ namespace Nov2019.Scenes
             size = font.MeasureString(text);
             renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 1f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
 
-            text = "FPS値 : " + frameCounter.FPS;
+            text = "FPS値 : " + frameCounter.FPS.ToString("0.00").PadLeft(3, ' ');
             size = font.MeasureString(text);
             renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 2f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
 

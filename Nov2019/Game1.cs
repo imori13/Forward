@@ -24,9 +24,9 @@ namespace Nov2019
             // フルスクリーンモードから画面を切り替えると実行中のまま消えるアレをなくす処理
             graphics.HardwareModeSwitch = false;
             // DrawメソッドをモニタのVerticalRetraceと同期しない
-            graphics.SynchronizeWithVerticalRetrace = false;
+            graphics.SynchronizeWithVerticalRetrace = true;
             // Updateメソッドをデフォルトのレート(1/60秒)で呼び出し
-            IsFixedTimeStep = true;
+            IsFixedTimeStep = false;
 
             Screen.UpdateScreenSize(graphics, Window);
 
