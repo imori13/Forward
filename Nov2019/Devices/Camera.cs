@@ -11,6 +11,7 @@ namespace Nov2019.Devices
 {
     class Camera
     {
+        public ObjectsManager ObjectsManager { get; set; }
         public Vector3 Position { get; set; }
 
         // private
@@ -27,10 +28,10 @@ namespace Nov2019.Devices
         float yaw;
         float pitch;
 
+        Vector3 cameraPosAngleVec3;
         float cameraPosLatitude = 0;
-        float destCameraPosLatitude;
         float cameraPosLongitude = 0;
-        float destCameraPosLongitude;
+        float zoom;
 
         private bool shaking;
         private float shakeMagnitude;
@@ -75,31 +76,35 @@ namespace Nov2019.Devices
 
         Matrix CameraView(Player player)
         {
-            destCameraPosLatitude += (Input.GetMousePosition().Y - Screen.HEIGHT / 2f) * 0.5f;
-            destCameraPosLatitude = MathHelper.Clamp(destCameraPosLatitude, -15, 15);
-
-            destCameraPosLongitude += (Input.GetMousePosition().X - Screen.WIDTH / 2f) * 0.5f;
-
-            cameraPosLatitude = MathHelper.Lerp(cameraPosLatitude, destCameraPosLatitude, 1);
-            cameraPosLongitude = MathHelper.Lerp(cameraPosLongitude, destCameraPosLongitude, 1);
-
-            // カメラをプレイヤーの後ろに追従するように設定
-            Vector3 cameraPosAngleVec3 =
-                new Vector3(
-                    (float)Math.Cos(MathHelper.ToRadians(cameraPosLongitude)),
-                    (float)Math.Sin(MathHelper.ToRadians(cameraPosLatitude)),
-                    (float)Math.Sin(MathHelper.ToRadians(cameraPosLongitude)));
-
-            if (Input.IsRightMouseHold())
+            float destZoom = 50f;
+            if (player.PlayerRightClickMode)
             {
-                Position = Vector3.Lerp(Position, player.Position + Vector3.Up * 10 - player.AngleVec3 * 50f, 0.2f * Time.Speed);
+                destZoom = 30f;
+                cameraPosLatitude = 10;
+                cameraPosLongitude = MyMath.Vec2ToDeg(new Vector2(-player.AngleVec3.X, -player.AngleVec3.Z));
             }
             else
             {
-                Position = Vector3.Lerp(Position, player.Position + Vector3.Up * 15 + cameraPosAngleVec3 * 50f, 0.2f * Time.Speed);
+                cameraPosLatitude += (Input.GetMousePosition().Y - Screen.HEIGHT / 2f) * 0.25f;
+                cameraPosLatitude = MathHelper.Clamp(cameraPosLatitude, -20, 20);
+
+                cameraPosLongitude += (Input.GetMousePosition().X - Screen.WIDTH / 2f) * 0.25f;
             }
 
-            Vector3 viewPoint = player.Position + player.AngleVec3 * 1f;
+            // カメラをプレイヤーの後ろに追従するように設定
+            cameraPosAngleVec3 = Vector3.Lerp(
+                    cameraPosAngleVec3,
+                new Vector3(
+                    (float)Math.Cos(MathHelper.ToRadians(cameraPosLongitude)),
+                    (float)Math.Sin(MathHelper.ToRadians(cameraPosLatitude)),
+                    (float)Math.Sin(MathHelper.ToRadians(cameraPosLongitude))),
+                    1.0f);
+
+            zoom = MathHelper.Lerp(zoom, destZoom, 0.1f * Time.Speed);
+
+            Position = Vector3.Lerp(Position, player.Position + (cameraPosAngleVec3 * zoom), 1.0f * Time.Speed);
+
+            Vector3 viewPoint = player.Position;
 
             if (shaking)
             {
@@ -124,7 +129,7 @@ namespace Nov2019.Devices
             }
 
             // プレイヤーの方向をカメラが向く
-            Matrix matrix = Matrix.Lerp(View, Matrix.CreateLookAt(Position, viewPoint, Vector3.Up), 1 * Time.Speed);
+            Matrix matrix = Matrix.Lerp(View, Matrix.CreateLookAt(Position, viewPoint, Vector3.Up), 0.1f * Time.Speed);
 
             return matrix;
         }

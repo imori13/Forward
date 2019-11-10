@@ -24,7 +24,7 @@ namespace Nov2019.GameObjects
         public Camera Camera { get; private set; }
         public Player Player { get; private set; }
 
-        public static readonly float MapLength = 2000f;
+        public static readonly float MapLength = 5000f;
         // 分割数 / ルート空間の長さ
         public float unitLength { get; private set; } = (2 * 2 * 2) / MapLength;
 
@@ -105,7 +105,13 @@ namespace Nov2019.GameObjects
         public void Draw(Renderer renderer)
         {
             particles.ForEach(p => p.Draw(renderer, Camera));
-            gameobjects.ForEach(g => g.Draw(renderer));
+            gameobjects.ForEach(g =>
+            {
+                if (Vector3.DistanceSquared(Player.Position, g.Position) <= 500f * 500f)
+                {
+                    g.Draw(renderer);
+                }
+            });
 
             foreach (var g in gameobjects)
             {

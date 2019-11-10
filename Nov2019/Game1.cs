@@ -89,7 +89,7 @@ namespace Nov2019
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(new Color(40, 40, 40));
+            GraphicsDevice.Clear(new Color(50, 39, 50));
 
             sceneManager.Draw(renderer);
 

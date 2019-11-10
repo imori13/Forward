@@ -27,15 +27,17 @@ namespace Nov2019.Scenes
             ObjectsManager = new ObjectsManager(Camera);
             Player = new Player();
             frameCounter = new FrameCounter();
+
+            Camera.ObjectsManager = ObjectsManager;
         }
 
         public override void Initialize()
         {
-            float distance = 1000f;
+            float distance = ObjectsManager.MapLength / 2f;
 
-            for (int i = 0; i < 10000f; i++)
+            for (int i = 0; i < 50000f; i++)
             {
-                ObjectsManager.AddGameObject(new Cube(new Vector3(MyMath.RandF(-distance, distance), MyMath.RandF(-distance, distance), MyMath.RandF(-distance, distance))), true);
+                ObjectsManager.AddGameObject(new Cube(new Vector3(MyMath.RandF(-distance, distance), MyMath.RandF(-500, 500), MyMath.RandF(-distance, distance))), true);
             }
 
             ObjectsManager.AddGameObject(Player, true);

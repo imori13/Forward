@@ -50,13 +50,8 @@ namespace Nov2019.GameObjects
 
         public override void Draw(Renderer renderer)
         {
-            if (Vector3.DistanceSquared(ObjectsManager.Player.Position, Position) >= 500f * 500f)
-            {
-                return;
-            }
-
             Matrix world =
-                Matrix.CreateScale(Vector3.One * 0.1f) *
+                Matrix.CreateScale(Vector3.One * 0.2f) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z)) *

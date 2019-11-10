@@ -19,8 +19,10 @@ namespace Nov2019.GameObjects
         float rotateX;  // 船が傾く描写
         float destRotateX;
         Vector3 destVelocity;   // 目標移動量
-        float movespeed = 1f;
-        float rotateSpeed = 3f;
+        float movespeed = 2.5f;
+        float rotateSpeed;
+
+        public bool PlayerRightClickMode { get; private set; }
 
         float shotTime;
 
@@ -53,10 +55,11 @@ namespace Nov2019.GameObjects
             Rotation();
             UpdateListPos();
 
-
+            // 左クリック押してるか
+            // 押してたら攻撃する
             if (Input.IsLeftMouseHold())
             {
-                float shotLimit = 0.1f;
+                float shotLimit = 0.05f;
                 shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
 
                 if (shotTime >= shotLimit)
@@ -74,9 +77,12 @@ namespace Nov2019.GameObjects
                 shotTime = 0;
             }
 
-            if (Input.GetKey(Keys.G))
+            // 右クリック押してるか
+            PlayerRightClickMode = Input.IsRightMouseHold();
+
+            if (Input.GetKeyDown(Keys.G))
             {
-                for (int i = 0; i < 500f; i++)
+                for (int i = 0; i < 100f; i++)
                 {
                     ObjectsManager.AddParticle(new Spark_Particle3D(Position + AngleVec3 * 10f, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
                 }
@@ -120,7 +126,6 @@ namespace Nov2019.GameObjects
         private void Move()
         {
             // 移動・回転
-            //destVelocity *= 0.99f;
 
             if (Input.GetKey(Keys.Space) ||
             Input.GetLeftTriggerButton(0) > 0.5f ||
@@ -176,12 +181,14 @@ namespace Nov2019.GameObjects
         {
             destRotateX = 0;
 
-            if (Input.GetKey(Keys.D) || Input.GetRightStickState(0).X > 0.5f || Input.GetLeftStickState(0).X > 0.5f)
+            rotateSpeed = (PlayerRightClickMode) ? (1.0f) : (3.0f);
+
+            if (Input.GetKey(Keys.D) || Input.GetRightStickState(0).X > 0.5f || Input.GetLeftStickState(0).X > 0.5f || (PlayerRightClickMode && (Input.GetMousePosition().X - Screen.WIDTH / 2f) > 0.1f))
             {
                 destAngle += rotateSpeed * Time.Speed;
                 destRotateX = 25;
             }
-            if (Input.GetKey(Keys.A) || Input.GetRightStickState(0).X < -0.5f || Input.GetLeftStickState(0).X < -0.5f)
+            if (Input.GetKey(Keys.A) || Input.GetRightStickState(0).X < -0.5f || Input.GetLeftStickState(0).X < -0.5f || (PlayerRightClickMode && (Input.GetMousePosition().X - Screen.WIDTH / 2f) < -0.1f))
             {
                 destAngle -= rotateSpeed * Time.Speed;
                 destRotateX = -25;
