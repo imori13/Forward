@@ -51,15 +51,15 @@ namespace Nov2019.GameObjects
         {
             destVelocity = AngleVec3 * moveSpeed;
 
-            Angle += 0.1f;
+            Angle += 0.1f * Time.Speed;
 
             shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
             if (shotTime >= shotLimit)
             {
                 shotTime = 0;
                 ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position), false);
-                ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position+AngleVec3*20), false);
-                ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position + AngleVec3 * 40), false);
+                //ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position+AngleVec3*20), false);
+                //ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position + AngleVec3 * 40), false);
             }
 
             fireTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;

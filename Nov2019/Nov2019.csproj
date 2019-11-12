@@ -62,6 +62,7 @@
     <Compile Include="Devices\Particles\RadiationParticle2D.cs" />
     <Compile Include="Devices\Particles\BossRocketFire_Particle3D.cs" />
     <Compile Include="Devices\Particles\RocketFire_Particle3D.cs" />
+    <Compile Include="Devices\Particles\TrajectorySmokeParticle3D.cs" />
     <Compile Include="Devices\Particles\SmokeParticle3D.cs" />
     <Compile Include="Devices\Particles\Spark_Particle3D.cs" />
     <Compile Include="Devices\Renderer.cs" />

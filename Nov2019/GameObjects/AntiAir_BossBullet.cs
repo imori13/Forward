@@ -16,6 +16,9 @@ namespace Nov2019.GameObjects
         Vector3 explosionPosition;
         Vector3 direction;
 
+        float particleTime;
+        float particleLimit = 0.001f;
+
         public AntiAir_BossBullet(Vector3 position)
         {
             Position = position;
@@ -26,7 +29,7 @@ namespace Nov2019.GameObjects
             speed = MyMath.RandF(5, 10);
             player = ObjectsManager.Player;
 
-            explosionPosition = player.Position + MyMath.RandomCircleVec3() * MyMath.RandF(0, 200);
+            explosionPosition = player.Position + MyMath.RandomCircleVec3() * MyMath.RandF(0, 100);
 
             direction = explosionPosition - Position;
             direction.Normalize();
@@ -37,6 +40,15 @@ namespace Nov2019.GameObjects
             Velocity = direction * speed;
 
             Position += Velocity * Time.Speed;
+
+            particleTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+
+            if (particleTime >= particleLimit)
+            {
+                particleTime = 0;
+
+                ObjectsManager.AddParticle(new TrajectorySmokeParticle3D(Position - Velocity * 1, GameDevice.Instance().Random));
+            }
 
             if (Vector3.DistanceSquared(explosionPosition, Position) <= 100f)
             {
@@ -61,13 +73,24 @@ namespace Nov2019.GameObjects
 
         public override void Draw(Renderer renderer)
         {
-            // 描画
+            // 回転軸は外積で計算できる
+            var cross = Vector3.Cross(Vector3.Right, direction);
+
+            // 内積の公式
+            // dot = |V1||V2|cosθ
+            // ここでV1とV2が正規化されているなら（＝長さ１）なら
+            // dot = cosθ
+            direction.Normalize();
+            var dot = Vector3.Dot(Vector3.Right, direction);
+
+            // cosθが分かったのでAcosで角度を計算
+            var rad = Math.Acos(dot);
+
             Matrix world =
-                Matrix.CreateScale(new Vector3(0.1f, 0.1f, 1f)) *
-                Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(MyMath.Vec2ToDeg(new Vector2(direction.Z, direction.X)))) *
-                Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
-                Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
+                Matrix.CreateWorld(Vector3.Left, Vector3.Forward, Vector3.Up) *
+            Matrix.CreateScale(new Vector3(1f, 0.3f, 0.3f)) *
+                Matrix.CreateFromAxisAngle(cross, (float)rad) *
+                Matrix.CreateWorld(Position + new Vector3(0, 0.9f, 0), Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D("cube", Color.Yellow, Camera, world);
         }

@@ -7,26 +7,22 @@ using System.Threading.Tasks;
 
 namespace Nov2019.Devices.Particles
 {
-    class SmokeParticle3D : Particle3D
+    class TrajectorySmokeParticle3D : Particle3D
     {
         private Vector3 initScale;
-        float upY;
 
-        public SmokeParticle3D(
+        public TrajectorySmokeParticle3D(
             Vector3 position,
             Random random)
             : base(
                   "cube",
-                  Color.Lerp(Color.White, new Color(100, 100, 100), random.Next(100) / 100f),
-                   (float)random.NextDouble(),
+                  Color.Lerp(Color.White, Color.Black, random.Next(100) / 100f),
+                   (float)random.NextDouble() * 0.25f,
                   position + Vector3.Up,    // position
-                  new Vector3(
-                      random.Next(-100, 100) / 100f,
-                      random.Next(-100, 100) / 100f,
-                      random.Next(-100, 100) / 100f),
-                  random.Next(50, 150) / 100f,  //speed
+                  MyMath.RandomCircleVec3(),
+                  random.Next(0, 5) / 100f,  //speed
                   0.9f,
-                  Vector3.One * random.Next(100, 300) / 100f, //scale
+                  Vector3.One * random.Next(40, 100) / 100f, //scale
                   new Vector3(
                       random.Next(360) + (float)random.NextDouble(),
                       random.Next(360) + (float)random.NextDouble(),
@@ -40,14 +36,13 @@ namespace Nov2019.Devices.Particles
             direction.Normalize();
             initScale = scale;
             speed *= 1 / scale.Length() / 0.5f;
-            upY = random.Next(1, 10) / 100f;
         }
 
         public override void Update()
         {
             base.Update();
 
-            position += Vector3.Up * upY * Time.Speed;
+            position += direction * 0.1f * Time.Speed;
 
             scale = Vector3.Lerp(initScale, Vector3.Zero, GetAliveRate());
         }
