@@ -98,7 +98,7 @@ namespace Nov2019.Devices
                     (float)Math.Cos(MathHelper.ToRadians(cameraPosLongitude)),
                     (float)Math.Sin(MathHelper.ToRadians(cameraPosLatitude)),
                     (float)Math.Sin(MathHelper.ToRadians(cameraPosLongitude))),
-                    1.0f);
+                    1.0f * Time.Speed);
 
             zoom = MathHelper.Lerp(zoom, destZoom, 0.1f * Time.Speed);
 

@@ -22,6 +22,9 @@ namespace Nov2019.GameObjects
         float movespeed = 2.5f;
         float rotateSpeed;
 
+        float fireTime;
+        float fireLimit = 0.05f;
+
         public bool PlayerRightClickMode { get; private set; }
 
         float shotTime;
@@ -46,7 +49,7 @@ namespace Nov2019.GameObjects
 
         public override void Initialize()
         {
-
+            fireTime = fireLimit;
         }
 
         public override void Update()
@@ -59,8 +62,8 @@ namespace Nov2019.GameObjects
             // 押してたら攻撃する
             if (Input.IsLeftMouseHold())
             {
-                float shotLimit = 0.05f;
-                shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
+                float shotLimit = 0.2f;
+                shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
 
                 if (shotTime >= shotLimit)
                 {
@@ -82,9 +85,14 @@ namespace Nov2019.GameObjects
 
             if (Input.GetKeyDown(Keys.G))
             {
-                for (int i = 0; i < 100f; i++)
+                for (int i = 0; i < 50f; i++)
                 {
                     ObjectsManager.AddParticle(new Spark_Particle3D(Position + AngleVec3 * 10f, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                }
+
+                for (int i = 0; i < 25; i++)
+                {
+                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position + AngleVec3 * 10f, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
                 }
             }
         }
@@ -134,12 +142,19 @@ namespace Nov2019.GameObjects
             Input.IsPadButtonHold(Buttons.RightShoulder, 0))
             {
                 destVelocity = AngleVec3 * movespeed;
+                fireTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
 
-                Random rand = GameDevice.Instance().Random;
-                for (int i = 0; i < 1; i++)
+                if (fireTime >= fireLimit)
                 {
+                    fireTime = 0;
+                    Random rand = GameDevice.Instance().Random;
                     ObjectsManager.AddParticle(new RocketFire_Particle3D(Position - AngleVec3 * 4f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.15f, rand));
                 }
+            }
+            else
+            {
+                fireTime = fireLimit;
+                destVelocity *= 0.995f;
             }
 
             Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.Speed);

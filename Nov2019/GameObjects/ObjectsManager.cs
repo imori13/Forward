@@ -23,6 +23,7 @@ namespace Nov2019.GameObjects
 
         public Camera Camera { get; private set; }
         public Player Player { get; private set; }
+        public BossEnemy BossEnemy { get; private set; }
 
         public static readonly float MapLength = 5000f;
         // 分割数 / ルート空間の長さ
@@ -73,6 +74,11 @@ namespace Nov2019.GameObjects
             {
                 Player = gameobject as Player;
             }
+
+            if (gameobject is BossEnemy)
+            {
+                BossEnemy = gameobject as BossEnemy;
+            }
         }
 
         public void AddParticle(Particle particle)
@@ -109,7 +115,7 @@ namespace Nov2019.GameObjects
             particles.ForEach(p => p.Draw(renderer, Camera));
             gameobjects.ForEach(g =>
             {
-                if (Vector3.DistanceSquared(Player.Position, g.Position) <= 500f * 500f)
+                if (Vector3.DistanceSquared(Player.Position, g.Position) <= 1000f * 1000f)
                 {
                     g.Draw(renderer);
                 }

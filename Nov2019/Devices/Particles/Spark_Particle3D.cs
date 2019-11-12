@@ -11,6 +11,8 @@ namespace Nov2019.Devices.Particles
     {
         Vector3 initscale;
 
+        Vector3 initPos;
+
         public Spark_Particle3D(
             Vector3 position,
             Vector3 direction,
@@ -19,10 +21,10 @@ namespace Nov2019.Devices.Particles
                 "cube",
                 Color.Lerp(Color.Yellow, Color.White, (float)rand.NextDouble()),
                 MyMath.RandF(1, 2) * 0.25f,
-                position,
+                position + direction * MyMath.RandF(0, 5),
                 direction,
-                MyMath.RandF(10, 30) * 0.001f,  // speed
-                0.9f,   // friction
+                MyMath.RandF(10, 50) * 0.001f,  // speed
+                0.95f,   // friction
                 Vector3.One * MyMath.RandF(5, 10) * 0.1f,  // scale
                 Vector3.Zero,   // rotation
                 Vector3.Zero,  // rotationspeed
@@ -30,20 +32,21 @@ namespace Nov2019.Devices.Particles
                 )
         {
             speed *= 1 / scale.Length() * 25;
+            initPos = position;
         }
 
         public override void Initialize()
         {
             base.Initialize();
 
-            initscale = new Vector3(speed, speed * 0.1f, speed * 0.1f);
+            initscale = new Vector3(0.1f, 0.1f, 0.1f);
         }
 
         public override void Update()
         {
             base.Update();
 
-            scale = Vector3.Lerp(initscale, new Vector3(speed, speed * 0.1f, speed * 0.1f), aliveRate);
+            scale = Vector3.Lerp(initscale, new Vector3(0.1f + Vector3.Distance(initPos, position) * 0.1f, 0, 0), aliveRate);
         }
         public override void Draw(Renderer renderer, Camera camera)
         {
@@ -61,9 +64,10 @@ namespace Nov2019.Devices.Particles
             var rad = Math.Acos(dot);
 
             Matrix world =
-                Matrix.CreateScale(scale) *
+                Matrix.CreateWorld(Vector3.Left, Vector3.Forward, Vector3.Up) *
+            Matrix.CreateScale(scale) *
                 Matrix.CreateFromAxisAngle(cross, (float)rad) *
-                Matrix.CreateWorld(position + origin, Vector3.Forward, Vector3.Up);
+                Matrix.CreateWorld(position, Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D(
             modelName,

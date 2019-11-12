@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 
 namespace Nov2019.Devices.Particles
 {
-    class RocketFire_Particle3D : Particle3D
+    class BossRocketFire_Particle3D : Particle3D
     {
         Vector3 initScale;
 
-        public RocketFire_Particle3D(
+        public BossRocketFire_Particle3D(
             Vector3 position,
             Vector3 direction,
             Random rand
             ) : base(
                 "cube",
                 Color.Lerp(Color.Red, Color.Black, (float)rand.NextDouble()),
-                MyMath.RandF(1, 4) * 0.25f,
+                MyMath.RandF(5, 10) * 1,
                 position,
                 direction,
-                MyMath.RandF(10, 30) * 0.001f,  // speed
+                MyMath.RandF(10, 15) * 0.1f,  // speed
                 0.9f,   // friction
-                Vector3.One * MyMath.RandF(5, 10) * 0.1f,  // scale
+                Vector3.One * MyMath.RandF(2,4),  // scale
                 new Vector3(MyMath.RandF(360), MyMath.RandF(360), MyMath.RandF(360)),   // rotation
                 new Vector3(MyMath.RandF(-45, 45), MyMath.RandF(-45, 45), MyMath.RandF(-45, 45)),  // rotationspeed
                 new Vector3(0, 0, 0)  // origin
@@ -41,7 +41,7 @@ namespace Nov2019.Devices.Particles
 
         public override void Update()
         {
-            scale = Vector3.Lerp(scale, Vector3.Zero, 0.1f * Time.Speed);
+            scale = Vector3.Lerp(scale, Vector3.Zero, GetAliveRate() * Time.Speed);
 
             base.Update();
         }

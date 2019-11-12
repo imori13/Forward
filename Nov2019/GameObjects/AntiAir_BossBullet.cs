@@ -5,39 +5,31 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Nov2019.Devices;
-using Nov2019.Devices.Collision;
 using Nov2019.Devices.Particles;
 
 namespace Nov2019.GameObjects
 {
-    class PlayerBullet : GameObject
+    class AntiAir_BossBullet : GameObject
     {
-        Vector3 direction;
         float speed;
+        Player player;
+        Vector3 explosionPosition;
+        Vector3 direction;
 
-        public PlayerBullet(Vector3 Position, Vector3 direction)
+        public AntiAir_BossBullet(Vector3 position)
         {
-            this.Position = Position;
-            this.direction = direction;
-
-            Collider = new CircleCollider(this, 3);
+            Position = position;
         }
 
         public override void Initialize()
         {
-            speed = 20;
+            speed = MyMath.RandF(5, 10);
+            player = ObjectsManager.Player;
 
-            Vector2 distance = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(direction.Z, direction.X)) + MyMath.RandF(-1, 1));
-            direction += new Vector3(distance.Y, 0, distance.X);
+            explosionPosition = player.Position + MyMath.RandomCircleVec3() * MyMath.RandF(0, 200);
 
-            if (direction.Length() == 0)
-            {
-                IsDead = true;
-            }
-            else
-            {
-                direction.Normalize();
-            }
+            direction = explosionPosition - Position;
+            direction.Normalize();
         }
 
         public override void Update()
@@ -45,6 +37,21 @@ namespace Nov2019.GameObjects
             Velocity = direction * speed;
 
             Position += Velocity * Time.Speed;
+
+            if (Vector3.DistanceSquared(explosionPosition, Position) <= 100f)
+            {
+                IsDead = true;
+
+                for (int i = 0; i < 25; i++)
+                {
+                    ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                }
+
+                for (int i = 0; i < 10; i++)
+                {
+                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                }
+            }
 
             if (Vector3.DistanceSquared(ObjectsManager.Player.Position, Position) >= 1000 * 1000)
             {
@@ -72,20 +79,7 @@ namespace Nov2019.GameObjects
 
         public override void HitAction(GameObject gameObject)
         {
-            if (gameObject.GameObjectTag == GameObjectTag.BossEnemy)
-            {
-                IsDead = true;
 
-                for (int i = 0; i < 25; i++)
-                {
-                    ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
-                }
-
-                for (int i = 0; i < 10; i++)
-                {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
-                }
-            }
         }
     }
 }

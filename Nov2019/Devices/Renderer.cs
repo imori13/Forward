@@ -23,9 +23,9 @@ namespace Nov2019.Devices
         private Dictionary<string, Model> models = new Dictionary<string, Model>();
 
         // カメラ描画情報
-        private float fogS = 200;
-        private float fogE = 700;
-        private Color fogColor = Color.LightSkyBlue;
+        private float fogS = 0;
+        private float fogE = 1000;
+        private Color fogColor = new Color(50, 40, 50);
         private Vector3 AmbientLightColor = Vector3.One * 0.5f;
         private Vector3 EmissiveColor = Vector3.One * 0.25f;
         private Vector3 SpecularColor = Vector3.One * 1f;
@@ -46,7 +46,7 @@ namespace Nov2019.Devices
             spriteBatch.Begin(
                   SpriteSortMode.Deferred,
                   BlendState.AlphaBlend,
-                  SamplerState.LinearClamp,
+                  SamplerState.LinearWrap,
                   DepthStencilState.Default,
                   RasterizerState.CullCounterClockwise,
                   null,

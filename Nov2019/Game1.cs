@@ -59,6 +59,7 @@ namespace Nov2019
             renderer.Load3D("LowSphere", "Models/");
 
             renderer.LoadTexture("boat_red", "ModelTextures/");
+            renderer.LoadTexture("boat_blue", "ModelTextures/");
 
             Sound sound = GameDevice.Instance().Sound;
 
@@ -89,7 +90,7 @@ namespace Nov2019
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(new Color(50, 39, 50));
+            GraphicsDevice.Clear(new Color(50, 40, 50));
 
             sceneManager.Draw(renderer);
 

@@ -17,6 +17,7 @@ namespace Nov2019.Scenes
     class GameScene : SceneBase
     {
         Camera Camera;
+        BossEnemy BossEnemy;
         Player Player;
         ObjectsManager ObjectsManager;
         FrameCounter frameCounter;
@@ -26,6 +27,7 @@ namespace Nov2019.Scenes
             Camera = new Camera();
             ObjectsManager = new ObjectsManager(Camera);
             Player = new Player();
+            BossEnemy = new BossEnemy();
             frameCounter = new FrameCounter();
 
             Camera.ObjectsManager = ObjectsManager;
@@ -35,12 +37,13 @@ namespace Nov2019.Scenes
         {
             float distance = ObjectsManager.MapLength / 2f;
 
-            for (int i = 0; i < 50000f; i++)
+            for (int i = 0; i < 10000f; i++)
             {
                 ObjectsManager.AddGameObject(new Cube(new Vector3(MyMath.RandF(-distance, distance), MyMath.RandF(-500, 500), MyMath.RandF(-distance, distance))), true);
             }
 
             ObjectsManager.AddGameObject(Player, true);
+            ObjectsManager.AddGameObject(BossEnemy, true);
 
             base.Initialize();
         }
