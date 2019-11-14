@@ -62,7 +62,7 @@ namespace Nov2019.GameObjects
             // 押してたら攻撃する
             if (Input.IsLeftMouseHold())
             {
-                float shotLimit = 0.2f;
+                float shotLimit = 0.05f;
                 shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
 
                 if (shotTime >= shotLimit)

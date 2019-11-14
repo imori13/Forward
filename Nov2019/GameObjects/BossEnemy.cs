@@ -58,8 +58,8 @@ namespace Nov2019.GameObjects
             {
                 shotTime = 0;
                 ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position), false);
-                //ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position+AngleVec3*20), false);
-                //ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position + AngleVec3 * 40), false);
+                ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position + AngleVec3 * 50), false);
+                ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position + AngleVec3 * 100), false);
             }
 
             fireTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;

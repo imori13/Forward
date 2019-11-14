@@ -23,7 +23,7 @@ namespace Nov2019.Devices.Particles
                 MyMath.RandF(1, 2) * 0.25f,
                 position + direction * MyMath.RandF(0, 5),
                 direction,
-                MyMath.RandF(10, 50) * 0.001f,  // speed
+                MyMath.RandF(2, 10) * 0.01f,  // speed
                 0.95f,   // friction
                 Vector3.One * MyMath.RandF(5, 10) * 0.1f,  // scale
                 Vector3.Zero,   // rotation
@@ -39,14 +39,14 @@ namespace Nov2019.Devices.Particles
         {
             base.Initialize();
 
-            initscale = new Vector3(0.1f, 0.1f, 0.1f);
+            initscale = new Vector3(1,1,1);
         }
 
         public override void Update()
         {
             base.Update();
 
-            scale = Vector3.Lerp(initscale, new Vector3(0.1f + Vector3.Distance(initPos, position) * 0.1f, 0, 0), aliveRate);
+            scale = Vector3.Lerp(initscale, new Vector3(Vector3.Distance(initPos, position), 0, 0)*0.25f, aliveRate);
         }
         public override void Draw(Renderer renderer, Camera camera)
         {

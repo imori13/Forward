@@ -23,10 +23,11 @@ namespace Nov2019.GameObjects
 
             rotation = new Vector3(MyMath.RandF(360), MyMath.RandF(360), MyMath.RandF(360));
 
-            float speed = 1;
+            float speed = 10;
             rotationSpeed = new Vector3(MyMath.RandF(-speed, speed), MyMath.RandF(-speed, speed), MyMath.RandF(-speed, speed));
 
-            color = new Color(MyMath.RandF(200, 255), MyMath.RandF(200, 255), MyMath.RandF(200, 255));
+            //color = new Color(MyMath.RandF(200, 255), MyMath.RandF(200, 255), MyMath.RandF(200, 255));
+            color = Color.Yellow;
 
             //Collider = new CircleCollider(this, 1);
 
@@ -51,7 +52,7 @@ namespace Nov2019.GameObjects
         public override void Draw(Renderer renderer)
         {
             Matrix world =
-                Matrix.CreateScale(Vector3.One * 0.2f) *
+                Matrix.CreateScale(Vector3.One * 0.5f) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z)) *

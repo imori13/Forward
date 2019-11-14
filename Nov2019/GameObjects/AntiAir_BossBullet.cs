@@ -29,7 +29,7 @@ namespace Nov2019.GameObjects
             speed = MyMath.RandF(5, 10);
             player = ObjectsManager.Player;
 
-            explosionPosition = player.Position + MyMath.RandomCircleVec3() * MyMath.RandF(0, 100);
+            explosionPosition = player.Position + MyMath.RandomCircleVec3() * MyMath.RandF(0, 200);
 
             direction = explosionPosition - Position;
             direction.Normalize();

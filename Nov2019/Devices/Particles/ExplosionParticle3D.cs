@@ -17,13 +17,13 @@ namespace Nov2019.Devices.Particles
             Random random)
             : base(
                   "cube",
-                  Color.Lerp(Color.White, Color.MonoGameOrange, random.Next(100) / 100f),
-                  random.Next(0, 1) + (float)random.NextDouble(),
-                  position + direction * MyMath.RandF(0, 5),    // position
+                  Color.Lerp(Color.Black, Color.White, random.Next(100) / 100f),
+                  random.Next(5,7) + (float)random.NextDouble(),
+                  position,    // position
                   direction,
-                  random.Next(25, 50) / 100f,  //speed
-                  0.95f,
-                  Vector3.One * random.Next(10, 150) / 100f, //scale
+                  MyMath.RandF(1,40),  //speed
+                  0.9f,
+                  Vector3.One * random.Next(10, 500) / 100f, //scale
                   new Vector3(
                       random.Next(360) + (float)random.NextDouble(),
                       random.Next(360) + (float)random.NextDouble(),
@@ -36,7 +36,7 @@ namespace Nov2019.Devices.Particles
         {
             direction.Normalize();
             initScale = scale;
-            speed *= 1 / scale.Length() / 0.5f;
+            speed *= 1 / scale.Length()*0.5f;
         }
 
         public override void Update()
