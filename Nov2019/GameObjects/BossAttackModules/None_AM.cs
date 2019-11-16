@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nov2019.GameObjects.AttackModules
+namespace Nov2019.GameObjects.BossAttackModules
 {
     class None_AM : AttackModule
     {

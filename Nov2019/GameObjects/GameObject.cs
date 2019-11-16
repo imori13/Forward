@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Nov2019.Devices;
 using Nov2019.Devices.Collision;
-using Nov2019.GameObjects.AttackModules;
-using Nov2019.GameObjects.MoveModules;
 using System;
 using System.Collections.Generic;
 using System.Linq;

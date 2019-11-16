@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nov2019.GameObjects.MoveModules
+namespace Nov2019.GameObjects.BossMoveModules
 {
     abstract class MoveModule
     {

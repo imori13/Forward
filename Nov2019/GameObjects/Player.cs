@@ -23,7 +23,7 @@ namespace Nov2019.GameObjects
         float rotateSpeed;
 
         float fireTime;
-        float fireLimit = 0.05f;
+        float fireLimit = 0.01f;
 
         public bool PlayerRightClickMode { get; private set; }
 

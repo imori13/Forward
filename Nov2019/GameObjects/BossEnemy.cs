@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Nov2019.Devices;
 using Nov2019.Devices.Collision;
 using Nov2019.Devices.Particles;
-using Nov2019.GameObjects.AttackModules;
 using Nov2019.GameObjects.BossAttackModules;
 using Nov2019.GameObjects.BossMoveModules;
-using Nov2019.GameObjects.MoveModules;
 
 namespace Nov2019.GameObjects
 {
@@ -24,6 +23,8 @@ namespace Nov2019.GameObjects
             Stage02,
             Wait02,
         }
+
+        public Vector3 DestVelocity { get; set; }
 
         public float BossHP { get; set; }
 
@@ -41,7 +42,7 @@ namespace Nov2019.GameObjects
 
         // 最初の待機状態の変数
         float wait00Time;
-        float wait00Limit = 5.0f;
+        float wait00Limit = 1.0f;
 
         // 角度をベクトルに変換するプロパティ
         public Vector3 AngleVec3
@@ -72,6 +73,10 @@ namespace Nov2019.GameObjects
 
         public override void Update()
         {
+            Velocity = Vector3.Lerp(Velocity, DestVelocity, 0.1f * Time.Speed);
+
+            Position += Velocity * Time.Speed;
+
             BossStateManage();
             BossAMMMManage();
 
@@ -96,7 +101,14 @@ namespace Nov2019.GameObjects
 
         public override void DrawUI(Renderer renderer)
         {
+            SpriteFont font = Fonts.FontCica_32;
+            string text;
+            Vector2 size;
 
+            float distance = Vector3.Distance(Position, ObjectsManager.Player.Position);
+            text = "プレイヤーとボスの距離 : " + distance.ToString("000.00");
+            size = font.MeasureString(text);
+            renderer.DrawString(font, text, new Vector2(0, Screen.HEIGHT - size.Y * 0f), Color.White, 0, new Vector2(0, size.Y), Vector2.One);
         }
 
         public override void HitAction(GameObject gameObject)
@@ -138,7 +150,14 @@ namespace Nov2019.GameObjects
         {
             if (AttackModule.IsEndFlag)
             {
-                AttackModule = new None_AM(this);
+                if (Vector3.Distance(Position, ObjectsManager.Player.Position) >= 400)
+                {
+                    AttackModule = new AntiAir_AM(this);
+                }
+                else
+                {
+                    AttackModule = new Housya_AM(this);
+                }
             }
 
             if (MoveModule.IsEndFlag)
