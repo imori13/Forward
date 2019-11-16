@@ -71,6 +71,7 @@
     <Compile Include="Devices\Time.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameObjects\BossAttackModules\Housya_AM.cs" />
+    <Compile Include="GameObjects\BossAttackModules\Mine_AM.cs" />
     <Compile Include="GameObjects\Bullets\AntiAir_BossBullet.cs" />
     <Compile Include="GameObjects\BossAttackModules\AntiAir_AM.cs" />
     <Compile Include="GameObjects\BossAttackModules\AttackModule.cs" />

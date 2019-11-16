@@ -10,6 +10,7 @@ namespace Nov2019.Devices.Particles
     class ExplosionParticle3D : Particle3D
     {
         private Vector3 initScale;
+        Color destColor;
 
         public ExplosionParticle3D(
             Vector3 position,
@@ -17,11 +18,11 @@ namespace Nov2019.Devices.Particles
             Random random)
             : base(
                   "cube",
-                  Color.Lerp(Color.Black, Color.White, random.Next(100) / 100f),
-                  random.Next(5,7) + (float)random.NextDouble(),
+                  Color.Lerp(Color.Red, Color.Orange, random.Next(100) / 100f),
+                  random.Next(5, 7) + (float)random.NextDouble(),
                   position,    // position
                   direction,
-                  MyMath.RandF(1,40),  //speed
+                  MyMath.RandF(1, 40),  //speed
                   0.9f,
                   Vector3.One * random.Next(10, 500) / 100f, //scale
                   new Vector3(
@@ -36,13 +37,16 @@ namespace Nov2019.Devices.Particles
         {
             direction.Normalize();
             initScale = scale;
-            speed *= 1 / scale.Length()*0.5f;
+            speed *= 1 / scale.Length() * 0.5f;
+            
+            destColor = Color.Lerp(Color.Black, Color.White, MyMath.RandF(1));
         }
 
         public override void Update()
         {
             base.Update();
 
+            modelColor = Color.Lerp(modelColor, destColor, GetAliveRate());
             scale = initScale * (Math.Abs(GetAliveRate() - 1));
             if (scale.X <= 0.0001f || scale.Y <= 0.0001f || scale.Z <= 0.0001f)
             {
