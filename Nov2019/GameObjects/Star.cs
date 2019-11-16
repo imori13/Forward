@@ -9,7 +9,7 @@ using Nov2019.Devices.Collision;
 
 namespace Nov2019.GameObjects
 {
-    class Cube : GameObject
+    class Star : GameObject
     {
         Vector3 rotation;
         Vector3 rotationSpeed;
@@ -17,7 +17,7 @@ namespace Nov2019.GameObjects
 
         Random rand = GameDevice.Instance().Random;
 
-        public Cube(Vector3 position)
+        public Star(Vector3 position)
         {
             Position = position;
 
@@ -42,11 +42,6 @@ namespace Nov2019.GameObjects
         public override void Update()
         {
             rotation += rotationSpeed * Time.Speed;
-
-            Position += Velocity;
-            Velocity *= 0.95f;
-
-            UpdateListPos();
         }
 
         public override void Draw(Renderer renderer)

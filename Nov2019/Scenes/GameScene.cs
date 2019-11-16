@@ -39,7 +39,7 @@ namespace Nov2019.Scenes
 
             for (int i = 0; i < 10000f; i++)
             {
-                ObjectsManager.AddGameObject(new Cube(new Vector3(MyMath.RandF(-distance, distance), MyMath.RandF(-500, 500), MyMath.RandF(-distance, distance))), true);
+                ObjectsManager.AddGameObject(new Star(new Vector3(MyMath.RandF(-distance, distance), MyMath.RandF(-500, 500), MyMath.RandF(-distance, distance))), true);
             }
 
             ObjectsManager.AddGameObject(Player, true);

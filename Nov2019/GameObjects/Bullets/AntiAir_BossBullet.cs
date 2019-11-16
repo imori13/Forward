@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 using Nov2019.Devices;
 using Nov2019.Devices.Particles;
 
-namespace Nov2019.GameObjects
+namespace Nov2019.GameObjects.Bullets
 {
     class AntiAir_BossBullet : GameObject
     {

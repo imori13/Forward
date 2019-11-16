@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Nov2019.Devices;
 using Nov2019.Devices.Collision;
+using Nov2019.GameObjects.AttackModules;
+using Nov2019.GameObjects.MoveModules;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Nov2019.GameObjects
         // 変数
         public uint CurrentRootPos { get; set; } = uint.MaxValue;   // 空間分割したなかのどの空間にいるのか
         public Vector3 Position { get; set; } // 位置
-        public Vector3 Velocity { get; protected set; } // 移動量 処理は各自必要な場合
+        public Vector3 Velocity { get; set; } // 移動量 処理は各自必要な場合
         public GameObjectTag GameObjectTag { get; set; }  // ゲームタグ
         public Collider Collider { get; protected set; }
         public bool IsDead { get; protected set; }  // 死亡してるか

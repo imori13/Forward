@@ -7,21 +7,41 @@ using Microsoft.Xna.Framework;
 using Nov2019.Devices;
 using Nov2019.Devices.Collision;
 using Nov2019.Devices.Particles;
+using Nov2019.GameObjects.AttackModules;
+using Nov2019.GameObjects.BossAttackModules;
+using Nov2019.GameObjects.BossMoveModules;
+using Nov2019.GameObjects.MoveModules;
 
 namespace Nov2019.GameObjects
 {
     class BossEnemy : GameObject
     {
+        public enum BossStateEnum
+        {
+            Wait00, // 待機
+            Stage01,
+            Wait01, // やられ演出とか
+            Stage02,
+            Wait02,
+        }
+
+        public float BossHP { get; set; }
+
+        public AttackModule AttackModule { get; set; }
+        public MoveModule MoveModule { get; set; }
+
+        // ボスの状態
+        public BossStateEnum BossState { get; set; }
+
+        public float DestAngle { get; set; }
         public float Angle { get; private set; }    // 向く角度
-        float destAngle;
-        Vector3 destVelocity;   // 目標移動量
-        float moveSpeed = 0.5f;
 
         float fireTime;
         float fireLimit = 0.05f;
 
-        float shotTime;
-        float shotLimit = 0.1f;
+        // 最初の待機状態の変数
+        float wait00Time;
+        float wait00Limit = 5.0f;
 
         // 角度をベクトルに変換するプロパティ
         public Vector3 AngleVec3
@@ -44,62 +64,21 @@ namespace Nov2019.GameObjects
 
         public override void Initialize()
         {
+            BossState = BossStateEnum.Wait00;
 
+            AttackModule = new None_AM(this);
+            MoveModule = new Rotate_MM(this);
         }
 
         public override void Update()
         {
-            destVelocity = AngleVec3 * moveSpeed;
+            BossStateManage();
+            BossAMMMManage();
 
-            Angle += 0.1f * Time.Speed;
+            AttackModule.Attack();
+            MoveModule.Move();
 
-            shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
-            if (shotTime >= shotLimit)
-            {
-                shotTime = 0;
-                ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position), false);
-                ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position + AngleVec3 * 50), false);
-                ObjectsManager.AddGameObject(new AntiAir_BossBullet(Position + AngleVec3 * 100), false);
-            }
-
-            fireTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
-
-            if (fireTime >= fireLimit)
-            {
-                fireTime = 0;
-                Random rand = GameDevice.Instance().Random;
-                ObjectsManager.AddParticle(new BossRocketFire_Particle3D(Position - AngleVec3 * 50f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.05f, rand));
-            }
-
-            Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.Speed);
-
-            Position += Velocity * Time.Speed;
-
-            Vector3 offset = new Vector3(10, 0, 10);
-
-            float forcePower = 0.5f;
-            if (Position.X < offset.X)
-            {
-                Velocity = new Vector3(forcePower, 0, Velocity.Z);
-                destVelocity = Vector3.Zero;
-            }
-            else if (Position.Z < offset.Z)
-            {
-                Velocity = new Vector3(Velocity.X, 0, forcePower);
-                destVelocity = Vector3.Zero;
-            }
-            else if (Position.X > ObjectsManager.MapLength - offset.X)
-            {
-                Velocity = new Vector3(-forcePower, 0, Velocity.Z);
-                destVelocity = Vector3.Zero;
-            }
-            else if (Position.Z > ObjectsManager.MapLength - offset.Z)
-            {
-                Velocity = new Vector3(Velocity.X, 0, -forcePower);
-                destVelocity = Vector3.Zero;
-            }
-
-            Position = Vector3.Clamp(Position, Vector3.Zero + offset, new Vector3(ObjectsManager.MapLength, 0, ObjectsManager.MapLength) - offset);
+            Angle = MathHelper.Lerp(Angle, DestAngle, 0.05f);
         }
 
         public override void Draw(Renderer renderer)
@@ -123,6 +102,88 @@ namespace Nov2019.GameObjects
         public override void HitAction(GameObject gameObject)
         {
 
+        }
+
+        void BossStateManage()
+        {
+            switch (BossState)
+            {
+                case BossStateEnum.Wait00:
+                    wait00Time += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+                    if (wait00Time >= wait00Limit)
+                    {
+                        BossState = BossStateEnum.Stage01;
+
+                        AttackModule = new AntiAir_AM(this);
+                        MoveModule = new Rotate_MM(this);
+                    }
+                    break;
+                case BossStateEnum.Stage01:
+
+                    break;
+                case BossStateEnum.Wait01:
+
+                    break;
+                case BossStateEnum.Stage02:
+
+                    break;
+                case BossStateEnum.Wait02:
+
+
+                    break;
+            }
+        }
+
+        void BossAMMMManage()
+        {
+            if (AttackModule.IsEndFlag)
+            {
+                AttackModule = new None_AM(this);
+            }
+
+            if (MoveModule.IsEndFlag)
+            {
+                MoveModule = new None_MM(this);
+            }
+        }
+
+        void MoveParticle()
+        {
+            // 移動パーティクル
+            fireTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+
+            if (fireTime >= fireLimit)
+            {
+                fireTime = 0;
+                Random rand = GameDevice.Instance().Random;
+                ObjectsManager.AddParticle(new BossRocketFire_Particle3D(Position - AngleVec3 * 50f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.05f, rand));
+            }
+        }
+
+        void ClampPosition()
+        {
+            // 位置を補正
+            Vector3 offset = new Vector3(10, 0, 10);
+
+            float forcePower = 0.5f;
+            if (Position.X < offset.X)
+            {
+                Velocity = new Vector3(forcePower, 0, Velocity.Z);
+            }
+            else if (Position.Z < offset.Z)
+            {
+                Velocity = new Vector3(Velocity.X, 0, forcePower);
+            }
+            else if (Position.X > ObjectsManager.MapLength - offset.X)
+            {
+                Velocity = new Vector3(-forcePower, 0, Velocity.Z);
+            }
+            else if (Position.Z > ObjectsManager.MapLength - offset.Z)
+            {
+                Velocity = new Vector3(Velocity.X, 0, -forcePower);
+            }
+
+            Position = Vector3.Clamp(Position, Vector3.Zero + offset, new Vector3(ObjectsManager.MapLength, 0, ObjectsManager.MapLength) - offset);
         }
     }
 }
