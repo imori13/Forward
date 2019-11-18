@@ -22,7 +22,7 @@ namespace Nov2019.GameObjects.BossAttackModules
 
         public override void Attack()
         {
-            time += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            time += Time.deltaTime;
 
             if (time >= limit)
             {

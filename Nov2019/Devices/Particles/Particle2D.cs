@@ -74,7 +74,7 @@ namespace Nov2019.Devices.Particles
         // overrideした子クラスでは最後に呼び出す。
         public override void Update()
         {
-            aliveTime += (float)gameDevice.GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;  // 時間数えてる
+            aliveTime +=Time.deltaTime;  // 時間数えてる
             aliveRate = aliveTime / aliveLimit; // レート=現在時間/生存時間  0.25=1/4 4秒のエフェクトでいま1秒なら0.25
             if (aliveTime > aliveLimit) // 生存時間超えたらしぬ
             {
@@ -85,7 +85,7 @@ namespace Nov2019.Devices.Particles
             rotation = MathHelper.Lerp(rotation_start, rotation_dest, GetAliveRate());
 
             // 速度*摩擦 どんどん移動速度が落ちるとかに
-            frictionTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            frictionTime += Time.deltaTime;
             if (frictionTime >= frictionLimit)
             {
                 frictionTime = 0;
@@ -93,7 +93,7 @@ namespace Nov2019.Devices.Particles
             }
 
             // 座標=移動角度*速度
-            position += direction * speed * Time.Speed;
+            position += direction * speed * Time.deltaSpeed;
         }
 
         public override void Draw(Renderer renderer, Camera camera)

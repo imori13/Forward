@@ -41,7 +41,7 @@ namespace Nov2019.Devices.Particles
 
         public override void Update()
         {
-            scale = Vector3.Lerp(scale, Vector3.Zero, 0.1f * Time.Speed);
+            scale = Vector3.Lerp(scale, Vector3.Zero, 0.1f * Time.deltaSpeed);
 
             base.Update();
         }

@@ -44,7 +44,7 @@ namespace Nov2019.GameObjects
         {
             Velocity = direction * speed;
 
-            Position += Velocity * Time.Speed;
+            Position += Velocity * Time.deltaSpeed;
 
             if (Vector3.DistanceSquared(ObjectsManager.Player.Position, Position) >= 1000 * 1000)
             {

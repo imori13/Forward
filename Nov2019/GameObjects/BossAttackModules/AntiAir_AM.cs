@@ -19,11 +19,12 @@ namespace Nov2019.GameObjects.BossAttackModules
         public AntiAir_AM(BossEnemy BossEnemy) : base(BossEnemy)
         {
             count = 0;
+            shotTime = -1f;
         }
 
         public override void Attack()
         {
-            shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            shotTime += Time.deltaTime;
             if (shotTime >= shotLimit)
             {
                 count++;

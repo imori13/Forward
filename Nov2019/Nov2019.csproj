@@ -72,12 +72,14 @@
     <Compile Include="Game1.cs" />
     <Compile Include="GameObjects\BossAttackModules\Housya_AM.cs" />
     <Compile Include="GameObjects\BossAttackModules\Mine_AM.cs" />
+    <Compile Include="GameObjects\BossAttackModules\Missile_AM.cs" />
     <Compile Include="GameObjects\Bullets\AntiAir_BossBullet.cs" />
     <Compile Include="GameObjects\BossAttackModules\AntiAir_AM.cs" />
     <Compile Include="GameObjects\BossAttackModules\AttackModule.cs" />
     <Compile Include="GameObjects\BossAttackModules\None_AM.cs" />
     <Compile Include="GameObjects\BossEnemy.cs" />
     <Compile Include="GameObjects\BossMoveModules\Rotate_MM.cs" />
+    <Compile Include="GameObjects\Bullets\Missile_Bullet.cs" />
     <Compile Include="GameObjects\Bullets\NormalBullet.cs" />
     <Compile Include="GameObjects\Star.cs" />
     <Compile Include="GameObjects\GameObject.cs" />

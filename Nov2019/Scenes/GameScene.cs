@@ -37,7 +37,7 @@ namespace Nov2019.Scenes
         {
             float distance = ObjectsManager.MapLength / 2f;
 
-            for (int i = 0; i < 10000f; i++)
+            for (int i = 0; i < 5000f; i++)
             {
                 ObjectsManager.AddGameObject(new Star(new Vector3(MyMath.RandF(-distance, distance), MyMath.RandF(-500, 500), MyMath.RandF(-distance, distance))), true);
             }

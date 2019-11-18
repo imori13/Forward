@@ -28,6 +28,7 @@ namespace Nov2019
             // Updateメソッドをデフォルトのレート(1/60秒)で呼び出し
             IsFixedTimeStep = false;
 
+
             Screen.UpdateScreenSize(graphics, Window);
 
             sceneManager = new SceneManager();
@@ -57,9 +58,11 @@ namespace Nov2019
             renderer.Load3D("boat", "Models/");
             renderer.Load3D("cube", "Models/");
             renderer.Load3D("LowSphere", "Models/");
+            renderer.Load3D("Missile", "Models/");
 
             renderer.LoadTexture("boat_red", "ModelTextures/");
             renderer.LoadTexture("boat_blue", "ModelTextures/");
+            renderer.LoadTexture("MissileTexture", "ModelTextures/");
 
             Sound sound = GameDevice.Instance().Sound;
 

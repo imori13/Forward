@@ -12,7 +12,8 @@ namespace Nov2019.Devices
     {
         static float time;
         static float dest;
-        public static float Speed { get { return time * frame * 60; } private set { time = value; } }
+        public static float deltaTime { get { return time * frame; } private set { time = value; } }
+        public static float deltaSpeed { get { return time * frame * 60; } }
         static float frame;
         public static bool IsHitStop { get; private set; }
         static float stopTime;
@@ -28,7 +29,7 @@ namespace Nov2019.Devices
         {
             dest = 1;
 
-            dest = (Input.GetKey(Keys.T)) ? (0.2f) : (1.00f);
+            dest = (Input.GetKey(Keys.T)) ? (0.1f) : (1.00f);
 
             if (IsHitStop)
             {

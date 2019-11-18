@@ -73,9 +73,9 @@ namespace Nov2019.GameObjects
 
         public override void Update()
         {
-            Velocity = Vector3.Lerp(Velocity, DestVelocity, 0.1f * Time.Speed);
+            Velocity = Vector3.Lerp(Velocity, DestVelocity, 0.1f * Time.deltaSpeed);
 
-            Position += Velocity * Time.Speed;
+            Position += Velocity * Time.deltaSpeed;
 
             BossStateManage();
             BossAMMMManage();
@@ -83,7 +83,7 @@ namespace Nov2019.GameObjects
             AttackModule.Attack();
             MoveModule.Move();
 
-            Angle = MathHelper.Lerp(Angle, DestAngle, 0.05f);
+            Angle = MathHelper.Lerp(Angle, DestAngle, 0.05f * Time.deltaSpeed);
         }
 
         public override void Draw(Renderer renderer)
@@ -121,12 +121,12 @@ namespace Nov2019.GameObjects
             switch (BossState)
             {
                 case BossStateEnum.Wait00:
-                    wait00Time += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+                    wait00Time += Time.deltaTime;
                     if (wait00Time >= wait00Limit)
                     {
                         BossState = BossStateEnum.Stage01;
 
-                        AttackModule = new AntiAir_AM(this);
+                        AttackModule = new Missile_AM(this);
                         MoveModule = new Rotate_MM(this);
                     }
                     break;
@@ -150,14 +150,22 @@ namespace Nov2019.GameObjects
         {
             if (AttackModule.IsEndFlag)
             {
-                if (Vector3.Distance(Position, ObjectsManager.Player.Position) >= 400)
+                Random rand = GameDevice.Instance().Random;
+                switch (rand.Next(3))
                 {
-                    AttackModule = new AntiAir_AM(this);
+                    case 0: AttackModule = new AntiAir_AM(this); break;
+                    case 1: AttackModule = new Housya_AM(this); break;
+                    case 2: AttackModule = new Missile_AM(this); break;
                 }
-                else
-                {
-                    AttackModule = new Housya_AM(this);
-                }
+
+                //if (Vector3.Distance(Position, ObjectsManager.Player.Position) >= 400)
+                //{
+                //    AttackModule = new AntiAir_AM(this);
+                //}
+                //else
+                //{
+                //    AttackModule = new Housya_AM(this);
+                //}
             }
 
             if (MoveModule.IsEndFlag)
@@ -169,7 +177,7 @@ namespace Nov2019.GameObjects
         void MoveParticle()
         {
             // 移動パーティクル
-            fireTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            fireTime += Time.deltaTime;
 
             if (fireTime >= fireLimit)
             {

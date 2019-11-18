@@ -10,7 +10,7 @@ namespace Nov2019.GameObjects.BossMoveModules
 {
     class Rotate_MM : MoveModule
     {
-        float moveSpeed = 1;
+        float moveSpeed = 3;
 
         public Rotate_MM(BossEnemy BossEnemy) : base(BossEnemy)
         {
@@ -20,7 +20,7 @@ namespace Nov2019.GameObjects.BossMoveModules
         {
             BossEnemy.DestVelocity = BossEnemy.AngleVec3 * moveSpeed;
 
-            BossEnemy.DestAngle += 0.5f * Time.Speed;
+            BossEnemy.DestAngle += 0.5f * Time.deltaSpeed;
         }
     }
 }

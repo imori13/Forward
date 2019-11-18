@@ -19,7 +19,7 @@ namespace Nov2019.GameObjects
         float rotateX;  // 船が傾く描写
         float destRotateX;
         Vector3 destVelocity;   // 目標移動量
-        float movespeed = 2.5f;
+        float movespeed = 4f;
         float rotateSpeed;
 
         float fireTime;
@@ -63,7 +63,7 @@ namespace Nov2019.GameObjects
             if (Input.IsLeftMouseHold())
             {
                 float shotLimit = 0.05f;
-                shotTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+                shotTime += Time.deltaTime;
 
                 if (shotTime >= shotLimit)
                 {
@@ -142,7 +142,7 @@ namespace Nov2019.GameObjects
             Input.IsPadButtonHold(Buttons.RightShoulder, 0))
             {
                 destVelocity = AngleVec3 * movespeed;
-                fireTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+                fireTime += Time.deltaTime;
 
                 if (fireTime >= fireLimit)
                 {
@@ -157,9 +157,9 @@ namespace Nov2019.GameObjects
                 destVelocity *= 0.995f;
             }
 
-            Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.Speed);
+            Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.deltaSpeed);
 
-            Position += Velocity * Time.Speed;
+            Position += Velocity *Time.deltaSpeed;
 
             Vector3 offset = new Vector3(10, 0, 10);
 
@@ -196,23 +196,23 @@ namespace Nov2019.GameObjects
         {
             destRotateX = 0;
 
-            rotateSpeed = (PlayerRightClickMode) ? (1.0f) : (3.0f);
+            rotateSpeed = (PlayerRightClickMode) ? (1.0f) : (1.5f);
 
             if (Input.GetKey(Keys.D) || Input.GetRightStickState(0).X > 0.5f || Input.GetLeftStickState(0).X > 0.5f || (PlayerRightClickMode && (Input.GetMousePosition().X - Screen.WIDTH / 2f) > 0.1f))
             {
-                destAngle += rotateSpeed * Time.Speed;
+                destAngle += rotateSpeed * Time.deltaSpeed;
                 destRotateX = 25;
             }
             if (Input.GetKey(Keys.A) || Input.GetRightStickState(0).X < -0.5f || Input.GetLeftStickState(0).X < -0.5f || (PlayerRightClickMode && (Input.GetMousePosition().X - Screen.WIDTH / 2f) < -0.1f))
             {
-                destAngle -= rotateSpeed * Time.Speed;
+                destAngle -= rotateSpeed * Time.deltaSpeed;
                 destRotateX = -25;
             }
 
             // 船のロール回転
-            rotateX = MathHelper.Lerp(rotateX, destRotateX, 0.05f * Time.Speed);
+            rotateX = MathHelper.Lerp(rotateX, destRotateX, 0.05f * Time.deltaSpeed);
             // 船のヨー回転(左右回転)
-            Angle = MathHelper.Lerp(Angle, destAngle, 0.1f * Time.Speed);
+            Angle = MathHelper.Lerp(Angle, destAngle, 0.1f * Time.deltaSpeed);
         }
     }
 }

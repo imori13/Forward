@@ -41,17 +41,17 @@ namespace Nov2019.GameObjects
 
         public override void Update()
         {
-            rotation += rotationSpeed * Time.Speed;
+            rotation += rotationSpeed * Time.deltaTime;
         }
 
         public override void Draw(Renderer renderer)
         {
             Matrix world =
-                Matrix.CreateScale(Vector3.One * 0.5f) *
-                Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y)) *
-                Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z)) *
-                Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
+            Matrix.CreateScale(Vector3.One * 0.5f) *
+            Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X)) *
+            Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y)) *
+            Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z)) *
+            Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D("cube", color, Camera, world);
         }

@@ -47,7 +47,7 @@ namespace Nov2019.Devices.Particles
                 IsDead = true;
             }
 
-            time += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            time +=Time.deltaTime;
             if (time >= limit)
             {
                 time = 0;

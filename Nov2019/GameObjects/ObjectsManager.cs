@@ -115,7 +115,7 @@ namespace Nov2019.GameObjects
             particles.ForEach(p => p.Draw(renderer, Camera));
             gameobjects.ForEach(g =>
             {
-                if (Vector3.DistanceSquared(Player.Position, g.Position) <= 1000f * 1000f)
+                if (Vector3.DistanceSquared(Player.Position, g.Position) <= 1500f * 1500f)
                 {
                     g.Draw(renderer);
                 }

@@ -39,15 +39,17 @@ namespace Nov2019.GameObjects.Bullets
         {
             Velocity = direction * speed;
 
-            Position += Velocity * Time.Speed;
+            Position += Velocity * Time.deltaSpeed;
 
-            particleTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            particleTime += Time.deltaTime;
 
             if (particleTime >= particleLimit)
             {
                 particleTime = 0;
 
-                ObjectsManager.AddParticle(new TrajectorySmokeParticle3D(Position - Velocity * 1, GameDevice.Instance().Random));
+                Random rand = GameDevice.Instance().Random;
+
+                ObjectsManager.AddParticle(new TrajectorySmokeParticle3D(Position - Velocity * 1, (float)rand.NextDouble() * 0.25f, rand));
             }
 
             if (Vector3.DistanceSquared(explosionPosition, Position) <= 100f)

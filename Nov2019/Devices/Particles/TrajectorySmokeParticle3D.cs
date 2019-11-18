@@ -13,11 +13,12 @@ namespace Nov2019.Devices.Particles
 
         public TrajectorySmokeParticle3D(
             Vector3 position,
+            float aliveLimit,
             Random random)
             : base(
                   "cube",
                   Color.Lerp(Color.White, Color.Black, random.Next(100) / 100f),
-                   (float)random.NextDouble() * 0.25f,
+                  aliveLimit,
                   position + Vector3.Up,    // position
                   MyMath.RandomCircleVec3(),
                   random.Next(0, 5) / 100f,  //speed
@@ -42,7 +43,7 @@ namespace Nov2019.Devices.Particles
         {
             base.Update();
 
-            position += direction * 0.1f * Time.Speed;
+            position += direction * 0.1f * Time.deltaSpeed;
 
             scale = Vector3.Lerp(initScale, Vector3.Zero, GetAliveRate());
         }

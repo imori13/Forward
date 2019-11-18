@@ -40,18 +40,20 @@ namespace Nov2019.GameObjects.Bullets
 
         public override void Update()
         {
-            Position += velocity * Time.Speed;
+            Position += velocity * Time.deltaSpeed;
             UpdateListPos();
 
-            particleTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            particleTime +=  Time.deltaTime;
             if (particleTime >= particleLimit)
             {
                 particleTime = 0;
 
-                ObjectsManager.AddParticle(new TrajectorySmokeParticle3D(Position - Velocity * 1, GameDevice.Instance().Random));
+                Random rand = GameDevice.Instance().Random;
+
+                ObjectsManager.AddParticle(new TrajectorySmokeParticle3D(Position - Velocity * 1, (float)rand.NextDouble() * 0.25f, rand));
             }
 
-            aliveTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds * Time.Speed;
+            aliveTime += Time.deltaTime;
             if (aliveTime >= aliveLimit)
             {
                 IsDead = true;
