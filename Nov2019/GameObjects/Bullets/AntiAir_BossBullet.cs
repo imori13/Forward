@@ -17,19 +17,28 @@ namespace Nov2019.GameObjects.Bullets
         Vector3 direction;
 
         float particleTime;
-        float particleLimit = 0.001f;
+        float particleLimit = 0.01f;
+
+        float prevDistance;
 
         public AntiAir_BossBullet(Vector3 position)
         {
             Position = position;
+            prevDistance = float.MaxValue;
         }
 
         public override void Initialize()
         {
-            speed = MyMath.RandF(5, 10);
             player = ObjectsManager.Player;
 
-            explosionPosition = player.Position + MyMath.RandomCircleVec3() * MyMath.RandF(0, 200);
+            float distance = Vector3.Distance(player.Position, Position);
+            speed = MyMath.RandF(2, 4);
+
+            // 時間 = 距離 / 速さ
+            float time = distance / speed;
+
+            // プレイヤーの 移動速度*時間 かける
+            explosionPosition = (player.Position + player.Velocity * time) + MyMath.RandomCircleVec3() * MyMath.RandF(100);
 
             direction = explosionPosition - Position;
             direction.Normalize();
@@ -52,7 +61,8 @@ namespace Nov2019.GameObjects.Bullets
                 ObjectsManager.AddParticle(new TrajectorySmokeParticle3D(Position - Velocity * 1, (float)rand.NextDouble() * 0.25f, rand));
             }
 
-            if (Vector3.DistanceSquared(explosionPosition, Position) <= 100f)
+            float currentDistance = Vector3.DistanceSquared(explosionPosition, Position);
+            if (currentDistance >= prevDistance)
             {
                 IsDead = true;
 
@@ -71,6 +81,8 @@ namespace Nov2019.GameObjects.Bullets
             {
                 IsDead = true;
             }
+
+            prevDistance = currentDistance;
         }
 
         public override void Draw(Renderer renderer)
@@ -94,7 +106,7 @@ namespace Nov2019.GameObjects.Bullets
                 Matrix.CreateFromAxisAngle(cross, (float)rad) *
                 Matrix.CreateWorld(Position + new Vector3(0, 0.9f, 0), Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("cube", Color.Yellow, Camera, world);
+            renderer.Draw3D("cube", Color.Black, Camera, world);
         }
 
         public override void DrawUI(Renderer renderer)

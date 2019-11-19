@@ -68,7 +68,7 @@ namespace Nov2019.GameObjects
             BossState = BossStateEnum.Wait00;
 
             AttackModule = new None_AM(this);
-            MoveModule = new Rotate_MM(this);
+            MoveModule = new Chase_MM(this);
         }
 
         public override void Update()
@@ -126,8 +126,8 @@ namespace Nov2019.GameObjects
                     {
                         BossState = BossStateEnum.Stage01;
 
-                        AttackModule = new Missile_AM(this);
-                        MoveModule = new Rotate_MM(this);
+                        AttackModule = new AntiAir_AM(this);
+                        MoveModule = new Chase_MM(this);
                     }
                     break;
                 case BossStateEnum.Stage01:
@@ -158,14 +158,7 @@ namespace Nov2019.GameObjects
                     case 2: AttackModule = new Missile_AM(this); break;
                 }
 
-                //if (Vector3.Distance(Position, ObjectsManager.Player.Position) >= 400)
-                //{
-                //    AttackModule = new AntiAir_AM(this);
-                //}
-                //else
-                //{
-                //    AttackModule = new Housya_AM(this);
-                //}
+                //AttackModule = new AntiAir_AM(this);
             }
 
             if (MoveModule.IsEndFlag)

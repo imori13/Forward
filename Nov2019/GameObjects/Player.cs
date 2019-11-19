@@ -19,7 +19,7 @@ namespace Nov2019.GameObjects
         float rotateX;  // 船が傾く描写
         float destRotateX;
         Vector3 destVelocity;   // 目標移動量
-        float movespeed = 4f;
+        float movespeed = 2f;
         float rotateSpeed;
 
         float fireTime;
@@ -60,10 +60,10 @@ namespace Nov2019.GameObjects
 
             // 左クリック押してるか
             // 押してたら攻撃する
+            shotTime += Time.deltaTime;
             if (Input.IsLeftMouseHold())
             {
-                float shotLimit = 0.05f;
-                shotTime += Time.deltaTime;
+                float shotLimit = 0.2f;
 
                 if (shotTime >= shotLimit)
                 {
@@ -75,7 +75,7 @@ namespace Nov2019.GameObjects
                     ObjectsManager.AddGameObject(new PlayerBullet(Position - i * 1, AngleVec3), false);
                 }
             }
-            else
+            else if(Input.IsLeftMouseUp())
             {
                 shotTime = 0;
             }

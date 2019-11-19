@@ -16,8 +16,8 @@ namespace Nov2019.GameObjects.Bullets
         float time;
         static readonly float chaseLimit = 1f;
         static readonly float deathLimit = 8;
-        static readonly float MAXMOVESPEED = 7;
-        static readonly float MINMOVESPEED = 2;
+        static readonly float MAXMOVESPEED = 4;
+        static readonly float MINMOVESPEED = 0.5f;
 
         float destMoveSpeed;
         float moveSpeed;
@@ -111,7 +111,7 @@ namespace Nov2019.GameObjects.Bullets
             var rad = Math.Acos(dot);
 
             Matrix world =
-                Matrix.CreateScale(3) *
+                Matrix.CreateScale(5) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(rotation)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(-90)) *
                 Matrix.CreateFromAxisAngle(cross, (float)rad) *
