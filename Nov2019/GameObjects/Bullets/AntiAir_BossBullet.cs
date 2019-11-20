@@ -23,6 +23,7 @@ namespace Nov2019.GameObjects.Bullets
 
         public AntiAir_BossBullet(Vector3 position)
         {
+            GameObjectTag = GameObjectTag.EnemyBullet;
             Position = position;
             prevDistance = float.MaxValue;
         }

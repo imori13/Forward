@@ -135,6 +135,23 @@ namespace Nov2019.GameObjects
             gameobjects.ForEach(g => g.DrawUI(renderer));
         }
 
+        public void RemoveEnemyBullet()
+        {
+            Random rand = GameDevice.Instance().Random;
+            gameobjects.ForEach(g =>
+            {
+                if (g.GameObjectTag == GameObjectTag.EnemyBullet)
+                {
+                    g.IsDead = true;
+
+                    for(int i = 0; i < 10; i++)
+                    {
+                        AddParticle(new SmokeParticle3D(g.Position, rand));
+                    }
+                }
+            });
+        }
+
         public void CollisionCheck()
         {
             for (int array = 0; array < Array.Length; array++)

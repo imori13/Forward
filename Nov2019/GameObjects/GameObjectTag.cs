@@ -12,5 +12,7 @@ namespace Nov2019.GameObjects
         Player, // プレイヤー
         BossEnemy,  // ボスエネミー
         Cube,
+        PlayerBullet,   // プレイヤーの弾
+        EnemyBullet,    // 敵の弾
     }
 }

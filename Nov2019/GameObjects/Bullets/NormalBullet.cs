@@ -24,6 +24,7 @@ namespace Nov2019.GameObjects.Bullets
 
         public NormalBullet(Vector3 position, Vector3 direction, float moveSpeed)
         {
+            GameObjectTag = GameObjectTag.EnemyBullet;
             Position = position;
             this.direction = direction;
             this.moveSpeed = moveSpeed;

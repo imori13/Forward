@@ -14,7 +14,7 @@ namespace Nov2019.GameObjects.BossMoveModules
 
         public override void Move()
         {
-
+            BossEnemy.DestVelocity = BossEnemy.AngleVec3 * 0;
         }
     }
 }

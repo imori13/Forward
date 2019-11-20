@@ -33,6 +33,7 @@ namespace Nov2019.GameObjects.Bullets
 
         public Missile_Bullet(Vector3 position, Vector3 direction)
         {
+            GameObjectTag = GameObjectTag.EnemyBullet;
             Position = position;
             this.direction = direction;
         }

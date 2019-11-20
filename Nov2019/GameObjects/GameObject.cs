@@ -18,7 +18,7 @@ namespace Nov2019.GameObjects
         public Vector3 Velocity { get; set; } // 移動量 処理は各自必要な場合
         public GameObjectTag GameObjectTag { get; set; }  // ゲームタグ
         public Collider Collider { get; protected set; }
-        public bool IsDead { get; protected set; }  // 死亡してるか
+        public bool IsDead { get; set; }  // 死亡してるか
         public ObjectsManager ObjectsManager { get; set; }
         public Camera Camera { get; set; }
 

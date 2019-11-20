@@ -27,6 +27,8 @@ namespace Nov2019.GameObjects
         {
             speed = 20;
 
+            GameObjectTag = GameObjectTag.PlayerBullet;
+
             Vector2 distance = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(direction.Z, direction.X)) + MyMath.RandF(-1, 1));
             direction += new Vector3(distance.Y, 0, distance.X);
 
