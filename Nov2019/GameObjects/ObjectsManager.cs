@@ -144,7 +144,7 @@ namespace Nov2019.GameObjects
                 {
                     g.IsDead = true;
 
-                    for(int i = 0; i < 10; i++)
+                    for(int i = 0; i < 4; i++)
                     {
                         AddParticle(new SmokeParticle3D(g.Position, rand));
                     }

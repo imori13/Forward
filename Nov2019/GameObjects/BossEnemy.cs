@@ -8,8 +8,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Nov2019.Devices;
 using Nov2019.Devices.Collision;
 using Nov2019.Devices.Particles;
+using Nov2019.GameObjects.AttackModuleManages;
 using Nov2019.GameObjects.BossAttackModules;
 using Nov2019.GameObjects.BossMoveModules;
+using Nov2019.GameObjects.Bullets;
 
 namespace Nov2019.GameObjects
 {
@@ -24,14 +26,13 @@ namespace Nov2019.GameObjects
 
         public Vector3 DestVelocity { get; set; }
 
-        public AttackModule AttackModule { get; set; }
-        public MoveModule MoveModule { get; set; }
-
         // ボスの状態
         public BossStateEnum BossState { get; set; }
 
         public float DestAngle { get; set; }
         public float Angle { get; private set; }    // 向く角度
+
+        public AttackModuleManage AttackModuleManage { get; private set; }
 
         float fireTime;
         float fireLimit = 0.05f;
@@ -40,6 +41,10 @@ namespace Nov2019.GameObjects
         float waitTime;
         static readonly float waitLimit = 2.5f;
         bool isWait;
+        bool isHeal;    // 回復状態か
+
+        float healRebootTime;
+        static readonly float healRebootLimit =3;
 
         public float BossHP { get; set; }
         public int DamageCount { get; private set; }    // HPが0になった回数
@@ -67,10 +72,10 @@ namespace Nov2019.GameObjects
         public override void Initialize()
         {
             BossState = BossStateEnum.Stage01;
+            AttackModuleManage = new Stage01AMManage(this);
+            AttackModuleManage.NoneModule();
 
-            AttackModule = new None_AM(this);
-            MoveModule = new Rotate_MM(this);
-
+            isWait = true;
             BossHP = 100;
         }
 
@@ -81,10 +86,7 @@ namespace Nov2019.GameObjects
             Position += Velocity * Time.deltaSpeed;
 
             BossStateManage();
-            BossAMMMManage();
-
-            AttackModule.Attack();
-            MoveModule.Move();
+            AttackModuleManage.Update();
 
             BossHPManage();
 
@@ -128,6 +130,10 @@ namespace Nov2019.GameObjects
             text = "ボスの状態 : " + BossState;
             size = font.MeasureString(text);
             renderer.DrawString(font, text, new Vector2(0, Screen.HEIGHT - size.Y * 3f), Color.White, 0, new Vector2(0, size.Y), Vector2.One);
+
+            text = "isWait : " + isWait;
+            size = font.MeasureString(text);
+            renderer.DrawString(font, text, new Vector2(0, Screen.HEIGHT - size.Y * 4f), Color.White, 0, new Vector2(0, size.Y), Vector2.One);
         }
 
         public override void HitAction(GameObject gameObject)
@@ -136,7 +142,8 @@ namespace Nov2019.GameObjects
 
             if (gameObject.GameObjectTag == GameObjectTag.PlayerBullet)
             {
-                BossHP -= 5;
+                BossHP -= 1;
+                isHeal = false;
             }
         }
 
@@ -156,36 +163,30 @@ namespace Nov2019.GameObjects
             }
         }
 
-        void BossAMMMManage()
+        void BossHPManage()
         {
-            // 待機状態ならリターン
-            if (isWait) { return; }
-
-            if (AttackModule.IsEndFlag)
+            if (isHeal)
             {
-                Random rand = GameDevice.Instance().Random;
-                switch (rand.Next(3))
+                BossHP += 0.25f * Time.deltaSpeed;
+            }
+            else
+            {
+                healRebootTime += Time.deltaTime;
+                if (healRebootTime >= healRebootLimit)
                 {
-                    case 0: AttackModule = new AntiAir_AM(this); break;
-                    case 1: AttackModule = new Housya_AM(this); break;
-                    case 2: AttackModule = new Missile_AM(this); break;
+                    healRebootTime = 0;
+                    isHeal = true;
                 }
             }
 
-            if (MoveModule.IsEndFlag)
-            {
-                MoveModule = new None_MM(this);
-            }
-        }
+            BossHP = MathHelper.Clamp(BossHP, 0, 100);
 
-        void BossHPManage()
-        {
             // ボスのHPが0なら
             if (BossHP <= 0)
             {
                 isWait = true;
-                AttackModule = new None_AM(this);
-                MoveModule = new None_MM(this);
+
+                AttackModuleManage.NoneModule();
 
                 // EnemyBulletを死亡させる
                 ObjectsManager.RemoveEnemyBullet();
@@ -209,6 +210,16 @@ namespace Nov2019.GameObjects
                     {
                         // 次の段階へ
                         BossState++;
+
+                        switch (BossState)
+                        {
+                            case BossStateEnum.Stage02:
+                                AttackModuleManage = new Stage02AMManage(this);
+                                break;
+                            case BossStateEnum.Stage03:
+                                AttackModuleManage = new Stage03AMManage(this);
+                                break;
+                        }
                     }
                 }
             }
@@ -222,10 +233,10 @@ namespace Nov2019.GameObjects
                 waitTime += Time.deltaTime;
                 if (waitTime >= waitLimit)
                 {
-                    AttackModule = new AntiAir_AM(this);
-                    MoveModule = new Rotate_MM(this);
                     isWait = false;
                     waitTime = 0;
+                    AttackModuleManage.ChangeModule();
+                    HousyaAttack();
                 }
             }
         }
@@ -238,10 +249,10 @@ namespace Nov2019.GameObjects
                 waitTime += Time.deltaTime;
                 if (waitTime >= waitLimit)
                 {
-                    AttackModule = new AntiAir_AM(this);
-                    MoveModule = new Chase_MM(this);
                     isWait = false;
                     waitTime = 0;
+                    AttackModuleManage.ChangeModule();
+                    HousyaAttack();
                 }
             }
         }
@@ -254,11 +265,24 @@ namespace Nov2019.GameObjects
                 waitTime += Time.deltaTime;
                 if (waitTime >= waitLimit)
                 {
-                    AttackModule = new AntiAir_AM(this);
-                    MoveModule = new Chase_MM(this);
                     isWait = false;
                     waitTime = 0;
+                    AttackModuleManage.ChangeModule();
+                    HousyaAttack();
                 }
+            }
+        }
+
+        void HousyaAttack()
+        {
+            Random rand = GameDevice.Instance().Random;
+
+            for (int i = 0; i < 360; i += 5)
+            {
+                Vector2 vec2 = MyMath.DegToVec2(i);
+                float randY = MyMath.RandF(-1, 1) * 0.1f;
+                Vector3 vec3 = new Vector3(vec2.Y, randY, vec2.X);
+                ObjectsManager.AddGameObject(new Normal_Bullet(Position, vec3, rand.Next(50, 100) * 0.01f), false);
             }
         }
 

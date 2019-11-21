@@ -19,15 +19,17 @@ namespace Nov2019.GameObjects
         float rotateX;  // 船が傾く描写
         float destRotateX;
         Vector3 destVelocity;   // 目標移動量
-        float movespeed = 2f;
+        static readonly float movespeed = 2f;
         float rotateSpeed;
 
+        float shotTime;
+        static readonly float shotLimit = 0.075f;
+
         float fireTime;
-        float fireLimit = 0.01f;
+        static readonly float fireLimit = 0.01f;
 
         public bool PlayerRightClickMode { get; private set; }
 
-        float shotTime;
 
         // 角度をベクトルに変換するプロパティ
         public Vector3 AngleVec3
@@ -63,8 +65,6 @@ namespace Nov2019.GameObjects
             shotTime += Time.deltaTime;
             if (Input.IsLeftMouseHold())
             {
-                float shotLimit = 0.2f;
-
                 if (shotTime >= shotLimit)
                 {
                     shotTime = 0;

@@ -19,12 +19,12 @@ namespace Nov2019.Devices.Particles
             : base(
                   "cube",
                   Color.Lerp(Color.Red, Color.Orange, random.Next(100) / 100f),
-                  random.Next(5, 7) + (float)random.NextDouble(),
+                  random.Next(0, 3) + (float)random.NextDouble(),
                   position,    // position
                   direction,
-                  MyMath.RandF(1, 40),  //speed
+                  MyMath.RandF(10, 40),  //speed
                   0.9f,
-                  Vector3.One * random.Next(10, 500) / 100f, //scale
+                  Vector3.One * random.Next(300, 500) / 100f, //scale
                   new Vector3(
                       random.Next(360) + (float)random.NextDouble(),
                       random.Next(360) + (float)random.NextDouble(),

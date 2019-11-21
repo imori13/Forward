@@ -10,7 +10,7 @@ using Nov2019.Devices.Particles;
 
 namespace Nov2019.GameObjects.Bullets
 {
-    class NormalBullet : GameObject
+    class Normal_Bullet : GameObject
     {
         Vector3 velocity;
         Vector3 direction;
@@ -22,13 +22,12 @@ namespace Nov2019.GameObjects.Bullets
         float particleTime;
         float particleLimit = 0.01f;
 
-        public NormalBullet(Vector3 position, Vector3 direction, float moveSpeed)
+        public Normal_Bullet(Vector3 position, Vector3 direction, float moveSpeed)
         {
             GameObjectTag = GameObjectTag.EnemyBullet;
             Position = position;
             this.direction = direction;
             this.moveSpeed = moveSpeed;
-            Collider = new CircleCollider(this, 1);
         }
 
         public override void Initialize()
@@ -42,7 +41,6 @@ namespace Nov2019.GameObjects.Bullets
         public override void Update()
         {
             Position += velocity * Time.deltaSpeed;
-            UpdateListPos();
 
             particleTime +=  Time.deltaTime;
             if (particleTime >= particleLimit)
@@ -75,7 +73,7 @@ namespace Nov2019.GameObjects.Bullets
         {
             // 描画
             Matrix world =
-                Matrix.CreateScale(1) *
+                Matrix.CreateScale(3) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(0)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
