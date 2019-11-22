@@ -57,6 +57,8 @@ namespace Nov2019.GameObjects.Bullets
             {
                 IsDead = true;
 
+                ObjectsManager.AddGameObject(new DamageCollision(Position), false);
+
                 for (int i = 0; i < 10; i++)
                 {
                     ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));

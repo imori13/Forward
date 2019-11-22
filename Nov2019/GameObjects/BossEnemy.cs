@@ -46,9 +46,13 @@ namespace Nov2019.GameObjects
         Color color;
 
         float collscale;
+        float offsetScale;
+        float offsetDestScale;
         static readonly int MIN_COLLSCALE = 30;
         static readonly int MAX_COLLSCALE = 90;
         float bariaAlpha;   // バリアの透明地
+        float bariaRotateY;
+        float bariaDestRotateY;
 
         float healRebootTime;
         static readonly float healRebootLimit = 3;
@@ -86,6 +90,7 @@ namespace Nov2019.GameObjects
             BossHP = 100;
             collscale = 50;
             color = Color.White;
+            bariaDestRotateY = 0;
         }
 
         public override void Update()
@@ -109,6 +114,10 @@ namespace Nov2019.GameObjects
 
             color = Color.Lerp(color, (isWait) ? (Color.Gray) : (Color.White), 0.1f * Time.deltaSpeed);
 
+            bariaRotateY = MathHelper.Lerp(bariaRotateY, bariaDestRotateY, 0.1f * Time.deltaSpeed);
+            offsetDestScale = MathHelper.Lerp(offsetDestScale, 0, 0.1f * Time.deltaSpeed);
+            offsetScale = MathHelper.Lerp(offsetScale, offsetDestScale, 0.5f * Time.deltaSpeed);
+
             Angle = MathHelper.Lerp(Angle, DestAngle, 0.05f * Time.deltaSpeed);
         }
 
@@ -128,9 +137,9 @@ namespace Nov2019.GameObjects
             if (isWait) { return; }
 
             world =
-                Matrix.CreateScale(collscale) *
+                Matrix.CreateScale(collscale + offsetScale) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(90 - Angle)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(90 - Angle + bariaRotateY)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
@@ -172,7 +181,9 @@ namespace Nov2019.GameObjects
             if (gameObject.GameObjectTag == GameObjectTag.PlayerBullet)
             {
                 BossHP -= 2;
+                bariaDestRotateY += 90;
                 isHeal = false;
+                offsetDestScale = 5;
             }
         }
 

@@ -14,6 +14,6 @@ namespace Nov2019.GameObjects
         Cube,
         PlayerBullet,   // プレイヤーの弾
         EnemyBullet,    // 敵の弾
-        DamageCollision,
+        DamageCollision,    // 当たり判定のみのヤツ
     }
 }
