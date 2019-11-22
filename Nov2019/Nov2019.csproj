@@ -84,6 +84,7 @@
     <Compile Include="GameObjects\BossAttackModules\None_AM.cs" />
     <Compile Include="GameObjects\BossEnemy.cs" />
     <Compile Include="GameObjects\BossMoveModules\Rotate_MM.cs" />
+    <Compile Include="GameObjects\Bullets\DamageCollision.cs" />
     <Compile Include="GameObjects\Bullets\Mine_Bullet.cs" />
     <Compile Include="GameObjects\Bullets\Missile_Bullet.cs" />
     <Compile Include="GameObjects\Bullets\Normal_Bullet.cs" />
