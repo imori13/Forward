@@ -31,6 +31,9 @@ namespace Nov2019.GameObjects.Bullets
         float rotation;
         float rotationSpeed;
 
+        float scale;
+        Color color;
+
         public Missile_Bullet(Vector3 position, Vector3 direction)
         {
             GameObjectTag = GameObjectTag.EnemyBullet;
@@ -45,6 +48,8 @@ namespace Nov2019.GameObjects.Bullets
             moveSpeed = 1;
             rotation = MyMath.RandF(360);
             rotationSpeed = GameDevice.Instance().Random.Next(2) == 0 ? 10 : -10;
+            scale = 5;
+            color = Color.White;
         }
 
         public override void Update()
@@ -61,32 +66,41 @@ namespace Nov2019.GameObjects.Bullets
                 destDirection = player.Position - Position;
                 destDirection.Normalize();
 
-                direction = Vector3.Lerp(direction, destDirection, 0.025f * Time.deltaSpeed);
+                if (time < deathLimit - 1.5f)
+                {
+                    direction = Vector3.Lerp(direction, destDirection, 0.025f * Time.deltaSpeed);
 
-                float distance = Math.Abs(MathHelper.ToDegrees(Vector3.Dot(destDirection, direction)));
+                    float distance = Math.Abs(MathHelper.ToDegrees(Vector3.Dot(destDirection, direction)));
 
-                distance = MathHelper.Clamp(distance, 0, 20);
-                float rate = distance / 20;
-                destMoveSpeed = MathHelper.Lerp(MINMOVESPEED, MAXMOVESPEED, rate);
+                    distance = MathHelper.Clamp(distance, 0, 20);
+                    float rate = distance / 20;
+                    destMoveSpeed = MathHelper.Lerp(MINMOVESPEED, MAXMOVESPEED, rate);
 
-                moveSpeed = MathHelper.Lerp(moveSpeed, destMoveSpeed, 0.05f * Time.deltaSpeed);
+                    moveSpeed = MathHelper.Lerp(moveSpeed, destMoveSpeed, 0.05f * Time.deltaSpeed);
+                }
 
                 Position += direction * moveSpeed * Time.deltaSpeed;
             }
 
-            // 死亡する処理
-            if (time >= deathLimit)
+            if (time >= deathLimit - 1.5f)
             {
-                IsDead = true;
+                scale = MathHelper.Lerp(scale, 15, 0.1f * Time.deltaSpeed);
+                color = Color.Lerp(color, Color.Red, 0.1f * Time.deltaSpeed);
 
-                for (int i = 0; i < 10; i++)
+                // 死亡する処理
+                if (time >= deathLimit)
                 {
-                    ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
-                }
+                    IsDead = true;
 
-                for (int i = 0; i < 10; i++)
-                {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                    for (int i = 0; i < 10; i++)
+                    {
+                        ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                    }
+
+                    for (int i = 0; i < 10; i++)
+                    {
+                        ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
+                    }
                 }
             }
 
@@ -112,13 +126,13 @@ namespace Nov2019.GameObjects.Bullets
             var rad = Math.Acos(dot);
 
             Matrix world =
-                Matrix.CreateScale(5) *
+                Matrix.CreateScale(scale) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(rotation)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(-90)) *
                 Matrix.CreateFromAxisAngle(cross, (float)rad) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("Missile", "MissileTexture", Camera, world);
+            renderer.Draw3D("Missile", "MissileTexture", color, Camera, world);
         }
 
         public override void DrawUI(Renderer renderer)

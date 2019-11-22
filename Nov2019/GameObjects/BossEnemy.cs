@@ -43,8 +43,15 @@ namespace Nov2019.GameObjects
         bool isWait;
         bool isHeal;    // 回復状態か
 
+        Color color;
+
+        float collscale;
+        static readonly int MIN_COLLSCALE = 30;
+        static readonly int MAX_COLLSCALE = 90;
+        float bariaAlpha;   // バリアの透明地
+
         float healRebootTime;
-        static readonly float healRebootLimit =3;
+        static readonly float healRebootLimit = 3;
 
         public float BossHP { get; set; }
         public int DamageCount { get; private set; }    // HPが0になった回数
@@ -77,6 +84,8 @@ namespace Nov2019.GameObjects
 
             isWait = true;
             BossHP = 100;
+            collscale = 50;
+            color = Color.White;
         }
 
         public override void Update()
@@ -92,20 +101,40 @@ namespace Nov2019.GameObjects
 
             MoveParticle();
 
+            float rate = BossHP / 100f;
+            collscale = MathHelper.Lerp(collscale, Easing2D.ExpOut(BossHP, 100, MAX_COLLSCALE, MIN_COLLSCALE), 0.25f * Time.deltaSpeed);
+            Collider = new CircleCollider(this, collscale);
+
+            bariaAlpha = (isWait) ? (0) : (MathHelper.Lerp(bariaAlpha, 0.5f, 0.1f * Time.deltaSpeed));
+
+            color = Color.Lerp(color, (isWait) ? (Color.Gray) : (Color.White), 0.1f * Time.deltaSpeed);
+
             Angle = MathHelper.Lerp(Angle, DestAngle, 0.05f * Time.deltaSpeed);
         }
 
         public override void Draw(Renderer renderer)
         {
             // 描画
-            Matrix world =
-                Matrix.CreateScale(25) *
+            Matrix world;
+            world =
+                Matrix.CreateScale(10) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(90 - Angle)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("boat", "boat_blue", Camera, world);
+            renderer.Draw3D("boat", "boat_blue", color, Camera, world);
+
+            if (isWait) { return; }
+
+            world =
+                Matrix.CreateScale(collscale) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(90 - Angle)) *
+                Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
+                Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
+
+            renderer.Draw3D("LowSphere", Color.Green * bariaAlpha, Camera, world);
         }
 
         public override void DrawUI(Renderer renderer)
@@ -142,7 +171,7 @@ namespace Nov2019.GameObjects
 
             if (gameObject.GameObjectTag == GameObjectTag.PlayerBullet)
             {
-                BossHP -= 1;
+                BossHP -= 2;
                 isHeal = false;
             }
         }
@@ -193,6 +222,7 @@ namespace Nov2019.GameObjects
 
                 // HPをリセット
                 BossHP = 100;
+                collscale = MIN_COLLSCALE;
 
                 // ダメージカウントをインクリメント
                 DamageCount++;
@@ -200,6 +230,8 @@ namespace Nov2019.GameObjects
                 // もし3回やっつけたら次の状態へ
                 if (DamageCount >= damageCountLimit)
                 {
+                    Time.StopTime();
+
                     DamageCount = 0;
                     // もし最終段階だったら、ボスは死ぬ
                     if ((int)BossState == 3)

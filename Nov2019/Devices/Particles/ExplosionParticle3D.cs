@@ -15,6 +15,7 @@ namespace Nov2019.Devices.Particles
         public ExplosionParticle3D(
             Vector3 position,
             Vector3 direction,
+            float speed,
             Random random)
             : base(
                   "cube",
@@ -22,7 +23,7 @@ namespace Nov2019.Devices.Particles
                   random.Next(0, 3) + (float)random.NextDouble(),
                   position,    // position
                   direction,
-                  MyMath.RandF(10, 40),  //speed
+                  MyMath.RandF(0, speed),  //speed
                   0.9f,
                   Vector3.One * random.Next(300, 500) / 100f, //scale
                   new Vector3(
@@ -38,7 +39,7 @@ namespace Nov2019.Devices.Particles
             direction.Normalize();
             initScale = scale;
             speed *= 1 / scale.Length() * 0.5f;
-            
+
             destColor = Color.Lerp(Color.Black, Color.White, MyMath.RandF(1));
         }
 

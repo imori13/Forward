@@ -209,5 +209,47 @@ namespace Nov2019.Devices
                 mesh.Draw();
             }
         }
+
+        // テクスチャを指定してModelに貼る。描画処理
+        public void Draw3D(string modelName, string modelTexture,Color color, Camera camera, Matrix world)
+        {
+            Debug.Assert(models.ContainsKey(modelName), "指定したAssetName[" + modelName + " ]または[ " + modelTexture + " ]がロードされていません。");
+
+            foreach (ModelMesh mesh in models[modelName].Meshes)
+            {
+                foreach (BasicEffect effect in mesh.Effects)
+                {
+                    effect.LightingEnabled = true;
+                    effect.DirectionalLight0.Enabled = true;
+                    effect.DirectionalLight0.Direction = new Vector3(0.1f, -0.5f, 1);
+                    effect.DirectionalLight0.DiffuseColor = new Vector3(1, 1, 1);
+                    effect.DirectionalLight0.SpecularColor = Color.White.ToVector3();
+                    effect.AmbientLightColor = AmbientLightColor;
+                    effect.EmissiveColor = EmissiveColor;
+                    effect.SpecularColor = SpecularColor;
+
+                    effect.World = world;
+                    effect.View = camera.View;
+                    effect.Projection = camera.Projection;
+
+                    effect.FogEnabled = true;
+                    effect.FogStart = fogS;
+                    effect.FogEnd = fogE;
+                    effect.FogColor = fogColor.ToVector3();
+
+                    if (modelTexture != null && modelTexture != "")
+                    {
+                        Debug.Assert(textures.ContainsKey(modelTexture), "指定したModelTexture[ " + modelTexture + " ]が存在しません");
+
+                        effect.DiffuseColor = color.ToVector3();
+                        effect.Alpha = color.A / 255f;
+                        effect.TextureEnabled = true;
+                        effect.Texture = textures[modelTexture];
+                    }
+                }
+
+                mesh.Draw();
+            }
+        }
     }
 }

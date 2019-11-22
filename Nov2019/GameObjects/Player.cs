@@ -92,7 +92,7 @@ namespace Nov2019.GameObjects
 
                 for (int i = 0; i < 25; i++)
                 {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position + AngleVec3 * 10f, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position + AngleVec3 * 10f, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
                 }
             }
         }

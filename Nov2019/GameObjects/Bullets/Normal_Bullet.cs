@@ -64,7 +64,7 @@ namespace Nov2019.GameObjects.Bullets
 
                 for (int i = 0; i < 10; i++)
                 {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
                 }
             }
         }

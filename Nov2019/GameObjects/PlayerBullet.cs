@@ -78,14 +78,14 @@ namespace Nov2019.GameObjects
             {
                 IsDead = true;
 
-                for (int i = 0; i < 25; i++)
+                for (int i = 0; i < 2; i++)
                 {
                     ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
                 }
 
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 1; i++)
                 {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
                 }
             }
         }

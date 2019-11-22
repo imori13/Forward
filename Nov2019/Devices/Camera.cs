@@ -35,7 +35,7 @@ namespace Nov2019.Devices
         float destCameraPosLongitude = 0;
         float zoom;
         Vector3 destViewPoint;
-        Vector3 viewPoint;
+        Vector3 cameraview_viewpoint;
 
         private bool shaking;
         private float shakeMagnitude;
@@ -43,6 +43,9 @@ namespace Nov2019.Devices
         private float shakeDelay;
         private float shakeTimer;
         private Vector3 shakeOffset;
+
+        // 時間停止
+        float cameraPosAngle;
 
         Vector3 velocity;
 
@@ -68,7 +71,17 @@ namespace Nov2019.Devices
             random = gameDevice.Random;
             gameTime = gameDevice.GameTime;
 
-            View = CameraView(player);
+            // 時間停止状態なら演出カメラ
+            if (Time.StopTimeMode && Time.stopTime >= 2.0f)
+            {
+                View = TimeStopView();
+            }
+            // 通常カメラ
+            else
+            {
+                View = CameraView(player);
+            }
+
             //View = Matrix.Lerp(View, DebugView(), 0.1f * Time.Speed);
 
             // マウスを画面の中心に置く
@@ -89,7 +102,7 @@ namespace Nov2019.Devices
                 destCameraPosLatitude = 10;
 
 
-                destViewPoint = player.Position+player.AngleVec3*50f;
+                destViewPoint = player.Position + player.AngleVec3 * 50f;
 
                 // 回転
                 // 線形補完を使った時３６０度→０度みたいにうごくとぐるっとなるので、それの回避
@@ -124,7 +137,7 @@ namespace Nov2019.Devices
 
             Position = player.Position + (cameraPosAngleVec3 * zoom);
 
-            viewPoint = Vector3.Lerp(viewPoint, destViewPoint, 0.1f * Time.deltaSpeed);
+            cameraview_viewpoint = Vector3.Lerp(cameraview_viewpoint, destViewPoint, 0.1f * Time.deltaSpeed);
 
             if (shaking)
             {
@@ -143,14 +156,45 @@ namespace Nov2019.Devices
                 shakeOffset = new Vector3(NextFloat(), NextFloat(), NextFloat()) * magnitude;
 
                 Position += shakeOffset;
-                viewPoint += shakeOffset;
+                cameraview_viewpoint += shakeOffset;
 
                 shakeMagnitude *= shakeDelay;
             }
 
             // プレイヤーの方向をカメラが向く
             //Matrix matrix = Matrix.Lerp(View, Matrix.CreateLookAt(Position, viewPoint, Vector3.Up), 1.0f * Time.Speed);
-            Matrix matrix = Matrix.CreateLookAt(Position, viewPoint, Vector3.Up);
+            Matrix matrix = Matrix.CreateLookAt(Position, cameraview_viewpoint, Vector3.Up);
+
+            return matrix;
+        }
+
+        Matrix TimeStopView()
+        {
+            Vector3 timestop_viewpoint = Vector3.Zero;
+            float distance = 0;
+            float yPos = 0;
+            if (Time.stopTime <= 5)
+            {
+                timestop_viewpoint = ObjectsManager.BossEnemy.Position;
+                distance = 100;
+                yPos = 20;
+            }
+            else
+            {
+                timestop_viewpoint = ObjectsManager.Player.Position;
+                distance = 40;
+                yPos = 10;
+            }
+
+            cameraPosAngle += 1 * Time.deltaSpeed;
+
+            Vector2 vec2 = MyMath.DegToVec2(cameraPosAngle);
+            Vector3 vec3 = new Vector3(vec2.X, 0, vec2.Y);
+            vec3.Normalize();
+
+            Position = timestop_viewpoint + (vec3 * distance) + (Vector3.Up * yPos);
+
+            Matrix matrix = Matrix.CreateLookAt(Position, timestop_viewpoint, Vector3.Up);
 
             return matrix;
         }
