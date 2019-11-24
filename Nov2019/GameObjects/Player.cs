@@ -30,6 +30,9 @@ namespace Nov2019.GameObjects
 
         static readonly int MAX_HITPOINT = 5;
         public int HitPoint { get; private set; }
+        public bool DeathFlag { get; private set; }
+        float deathTime;    
+        float deathLimit;   // 爆発するまでの時間
 
         public bool PlayerAimMode { get; private set; }
 
@@ -71,24 +74,42 @@ namespace Nov2019.GameObjects
             UpdateListPos();
             InvincibleManage();
 
-            // 左クリック押してるか
-            // 押してたら攻撃する
-            shotTime += Time.deltaTime;
-            if (Input.IsLeftMouseHold() || Input.GetRightTriggerButton(0) >= 0.5f)
+            if (Input.GetKeyDown(Keys.G))
             {
-                if (shotTime >= shotLimit)
+                HitPoint--;
+                if (0 <= HitPoint)
                 {
-                    shotTime = 0;
-
-                    Vector2 a = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(AngleVec3.Z, AngleVec3.X)) + 90f);
-                    Vector3 i = new Vector3(a.Y, 0, a.X);
-                    ObjectsManager.AddGameObject(new PlayerBullet(Position + i * 1, AngleVec3), false);
-                    ObjectsManager.AddGameObject(new PlayerBullet(Position - i * 1, AngleVec3), false);
+                    DeathFlag = true;
                 }
             }
-            else
+
+            // 左クリック押してるか
+            // 押してたら攻撃する
+            if (!DeathFlag)
             {
-                shotTime = 0;
+                shotTime += Time.deltaTime;
+                if (Input.IsLeftMouseHold() || Input.GetRightTriggerButton(0) >= 0.5f)
+                {
+                    if (shotTime >= shotLimit)
+                    {
+                        shotTime = 0;
+
+                        Vector2 a = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(AngleVec3.Z, AngleVec3.X)) + 90f);
+                        Vector3 i = new Vector3(a.Y, 0, a.X);
+                        ObjectsManager.AddGameObject(new PlayerBullet(Position + i * 1, AngleVec3), false);
+                        ObjectsManager.AddGameObject(new PlayerBullet(Position - i * 1, AngleVec3), false);
+                    }
+                }
+                else
+                {
+                    shotTime = 0;
+                }
+            }
+
+
+            if (deathTime >= deathLimit)
+            {
+
             }
         }
 
@@ -139,13 +160,13 @@ namespace Nov2019.GameObjects
 
         public override void HitAction(GameObject gameObject)
         {
-            bool returnFlag = (ObjectsManager.BossEnemy.isWait) || (InvincibleFlag);
+            bool returnFlag = (ObjectsManager.BossEnemy.isWait) || (InvincibleFlag) || (DeathFlag);
             if (returnFlag) { return; }
 
             if (gameObject.GameObjectTag == GameObjectTag.DamageCollision)
             {
                 HitPoint = Math.Max(HitPoint - 1, 0);
-
+                DeathFlag = HitPoint <= 0;
                 InvincibleFlag = true;
                 Time.HitStop();
                 Camera.Shake(5, 1, 0.95f);
@@ -156,19 +177,22 @@ namespace Nov2019.GameObjects
         private void Move()
         {
             // 移動
-            destVelocity = AngleVec3 * movespeed;
-            fireTime += Time.deltaTime;
-
-            if (fireTime >= fireLimit)
+            if (!DeathFlag)
             {
-                fireTime = 0;
-                Random rand = GameDevice.Instance().Random;
-                ObjectsManager.AddParticle(new RocketFire_Particle3D(Position - AngleVec3 * 4f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.15f, rand));
+                destVelocity = AngleVec3 * movespeed;
+                fireTime += Time.deltaTime;
+
+                if (fireTime >= fireLimit)
+                {
+                    fireTime = 0;
+                    Random rand = GameDevice.Instance().Random;
+                    ObjectsManager.AddParticle(new RocketFire_Particle3D(Position - AngleVec3 * 4f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.15f, rand));
+                }
+
+                Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.deltaSpeed);
+
+                Position += Velocity * Time.deltaSpeed;
             }
-
-            Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.deltaSpeed);
-
-            Position += Velocity * Time.deltaSpeed;
 
             Vector3 offset = new Vector3(10, 0, 10);
 
@@ -209,17 +233,20 @@ namespace Nov2019.GameObjects
 
 
             // 右クリック押してるか
-            PlayerAimMode = Input.IsRightMouseHold() || Input.GetLeftTriggerButton(0) >= 0.5f;
+            PlayerAimMode = (Input.IsRightMouseHold() || Input.GetLeftTriggerButton(0) >= 0.5f)&&!DeathFlag;
 
-            if (Input.GetKey(Keys.D) || Input.GetLeftStickState(0).X > 0.5f || (PlayerAimMode && (Input.GetMousePosition().X - Screen.WIDTH / 2) > 0.1f))
+            if (!DeathFlag)
             {
-                destAngle += rotateSpeed * Time.deltaSpeed;
-                destRotateX = 25;
-            }
-            if (Input.GetKey(Keys.A) || Input.GetLeftStickState(0).X < -0.5f || (PlayerAimMode && (Input.GetMousePosition().X - Screen.WIDTH / 2) < -0.1f))
-            {
-                destAngle -= rotateSpeed * Time.deltaSpeed;
-                destRotateX = -25;
+                if (Input.GetKey(Keys.D) || Input.GetLeftStickState(0).X > 0.5f || (PlayerAimMode && (Input.GetMousePosition().X - Screen.WIDTH / 2) > 0.1f))
+                {
+                    destAngle += rotateSpeed * Time.deltaSpeed;
+                    destRotateX = 25;
+                }
+                if (Input.GetKey(Keys.A) || Input.GetLeftStickState(0).X < -0.5f || (PlayerAimMode && (Input.GetMousePosition().X - Screen.WIDTH / 2) < -0.1f))
+                {
+                    destAngle -= rotateSpeed * Time.deltaSpeed;
+                    destRotateX = -25;
+                }
             }
 
             // 船のロール回転

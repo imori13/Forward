@@ -27,6 +27,8 @@ namespace Nov2019.GameObjects.BossMoveModules
             //float destAngle = MyMath.Vec2ToDeg(vec2);
             //BossEnemy.DestAngle = destAngle;
 
+            if (IsEndFlag) { return; }
+
             BossEnemy.DestAngle = angle;
 
             BossEnemy.DestVelocity = BossEnemy.AngleVec3 * 3f;

@@ -92,7 +92,7 @@ namespace Nov2019.GameObjects.Bullets
                 {
                     IsDead = true;
 
-                    ObjectsManager.AddGameObject(new DamageCollision(Position,100), false);
+                    ObjectsManager.AddGameObject(new DamageCollision(Position, 100), false);
 
                     for (int i = 0; i < 10; i++)
                     {
@@ -129,6 +129,7 @@ namespace Nov2019.GameObjects.Bullets
 
             Matrix world =
                 Matrix.CreateScale(scale) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(rotation)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(-90)) *
                 Matrix.CreateFromAxisAngle(cross, (float)rad) *

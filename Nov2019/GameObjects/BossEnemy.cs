@@ -44,7 +44,7 @@ namespace Nov2019.GameObjects
         public bool isWait { get; private set; }
         bool isHeal;    // 回復状態か
 
-        Color color;
+        Color bossColor;
 
         float collscale;
         float offsetScale;
@@ -54,6 +54,7 @@ namespace Nov2019.GameObjects
         float bariaAlpha;   // バリアの透明地
         float bariaRotateY;
         float bariaDestRotateY;
+        Color bariaColor;
 
         float healRebootTime;
         static readonly float healRebootLimit = 3;
@@ -66,6 +67,8 @@ namespace Nov2019.GameObjects
         public bool InvincibleFlag { get; private set; }
         float invincibleTime;
         static readonly float invincibleLimit = 8.0f;
+
+        Color bossHPColor;
 
         // 角度をベクトルに変換するプロパティ
         public Vector3 AngleVec3
@@ -95,7 +98,7 @@ namespace Nov2019.GameObjects
             isWait = true;
             BossHP = 100;
             collscale = 50;
-            color = Color.White;
+            bossColor = Color.White;
             bariaDestRotateY = 0;
         }
 
@@ -122,7 +125,9 @@ namespace Nov2019.GameObjects
 
             bariaAlpha = (isWait) ? (0) : (MathHelper.Lerp(bariaAlpha, 0.5f, 0.1f * Time.deltaSpeed));
 
-            color = Color.Lerp(color, (isWait) ? (Color.Gray) : (Color.White), 0.1f * Time.deltaSpeed);
+            bossColor = Color.Lerp(bossColor, (isWait) ? (Color.Gray) : (Color.White), 0.1f * Time.deltaSpeed);
+
+            bariaColor = Color.Lerp(bariaColor, (isWait||InvincibleFlag) ? (Color.Gray) : (Color.Green), 0.1f * Time.deltaSpeed);
 
             bariaRotateY = MathHelper.Lerp(bariaRotateY, bariaDestRotateY, 0.1f * Time.deltaSpeed);
             offsetDestScale = MathHelper.Lerp(offsetDestScale, 0, 0.1f * Time.deltaSpeed);
@@ -144,7 +149,7 @@ namespace Nov2019.GameObjects
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("boat", "boat_blue", color, Camera, world, false);
+            renderer.Draw3D("boat", "boat_blue", bossColor, Camera, world, false);
 
             if (isWait) { return; }
 
@@ -155,7 +160,7 @@ namespace Nov2019.GameObjects
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("LowSphere", Color.Green * bariaAlpha, Camera, world);
+            renderer.Draw3D("LowSphere", bariaColor * bariaAlpha, Camera, world);
         }
 
         public override void DrawUI(Renderer renderer)
@@ -163,6 +168,16 @@ namespace Nov2019.GameObjects
             SpriteFont font = Fonts.FontCica_32;
             string text;
             Vector2 size;
+
+            // ボスのステージ内のステージのHPのUI
+            Vector2 offset = Vector2.One * 5 * Screen.ScreenSize;
+            renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 105 * Screen.ScreenSize), Color.Black, MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(800, 20) * Screen.ScreenSize + offset);
+            if (!isWait)
+            {
+                Color destColor = (InvincibleFlag) ? (new Color(50, 50, 50)) : (new Color(200, 200, 200));
+                bossHPColor = Color.Lerp(bossHPColor, destColor, 0.1f * Time.deltaSpeed);
+                renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 105 * Screen.ScreenSize), bossHPColor, MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(Easing2D.CircOut(BossHP, 100, 0, 800), 20) * Screen.ScreenSize);
+            }
 
             // ボスのステージのUI
             float stageCount = 4;
@@ -198,14 +213,6 @@ namespace Nov2019.GameObjects
                 Vector2 pos = new Vector2(Screen.WIDTH / 2f + (((i + 0.5f) - hoge / 2f) * 50 * Screen.ScreenSize), 60 * Screen.ScreenSize);
                 renderer.Draw2D("Pixel", pos, Color.White, MathHelper.ToRadians(22.5f), Vector2.One * 0.5f, Vector2.One * 20 * Screen.ScreenSize);
                 renderer.Draw2D("Pixel", pos, color, MathHelper.ToRadians(22.5f), Vector2.One * 0.5f, Vector2.One * 15 * Screen.ScreenSize);
-            }
-
-            // ボスのステージ内のステージのHPのUI
-            Vector2 offset = Vector2.One * 3 * Screen.ScreenSize;
-            renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 180 * Screen.ScreenSize), Color.Black, MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(500, 3) * Screen.ScreenSize + offset);
-            if (!isWait && !InvincibleFlag)
-            {
-                renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 180 * Screen.ScreenSize), new Color(200, 200, 200), MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(500 * (BossHP / 100), 3) * Screen.ScreenSize);
             }
 
             // 攻撃モジュールのUI
@@ -270,7 +277,7 @@ namespace Nov2019.GameObjects
 
             if (gameObject.GameObjectTag == GameObjectTag.PlayerBullet)
             {
-                BossHP -= 2;
+                BossHP -= 0.75f;
                 bariaDestRotateY += 90;
                 isHeal = false;
                 offsetDestScale = 5;
@@ -297,7 +304,7 @@ namespace Nov2019.GameObjects
         {
             if (isHeal)
             {
-                BossHP += 0.25f * Time.deltaSpeed;
+                BossHP += 0.01f * Time.deltaSpeed;
             }
             else
             {
@@ -333,8 +340,12 @@ namespace Nov2019.GameObjects
                 DamageCount++;
                 DamageSumCount++;
 
+                bossHPColor = new Color(50, 50, 50);
+
                 // 無敵状態へ
                 InvincibleFlag = true;
+
+                bariaAlpha = 0;
 
                 // もし3回やっつけたら次の状態へ
                 if (DamageCount >= damageCountLimit)
@@ -358,6 +369,11 @@ namespace Nov2019.GameObjects
 
         void Stage01()
         {
+            if (MoveModule.IsEndFlag)
+            {
+                MoveModule = new CircleRandom_MM(this);
+            }
+
             // 起動
             if (isWait)
             {
@@ -377,6 +393,11 @@ namespace Nov2019.GameObjects
 
         void Stage02()
         {
+            if (MoveModule.IsEndFlag)
+            {
+                MoveModule = new CircleRandom_MM(this);
+            }
+
             // 起動
             if (isWait)
             {
@@ -394,6 +415,11 @@ namespace Nov2019.GameObjects
 
         void Stage03()
         {
+            if (MoveModule.IsEndFlag)
+            {
+                MoveModule = new CircleRandom_MM(this);
+            }
+
             // 起動
             if (isWait)
             {
@@ -454,13 +480,13 @@ namespace Nov2019.GameObjects
             {
                 invincibleTime += Time.deltaTime;
 
-                color = (invincibleTime % 0.08f <= 0.04f) ? (Color.Black) : (Color.White);
+                bossColor = (invincibleTime % 0.08f <= 0.04f) ? (Color.Black) : (Color.White);
 
                 if (invincibleTime >= invincibleLimit)
                 {
                     invincibleTime = 0;
                     InvincibleFlag = false;
-                    color = Color.White;
+                    bossColor = Color.White;
                 }
             }
         }

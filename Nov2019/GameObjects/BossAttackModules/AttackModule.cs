@@ -41,6 +41,8 @@ namespace Nov2019.GameObjects.BossAttackModules
             Count = 0;
             CoolTime = 0;
             CoolTimeFlag = true;
+            time = 0;
+            ShotFlag = false;
         }
 
         public virtual void Attack()
