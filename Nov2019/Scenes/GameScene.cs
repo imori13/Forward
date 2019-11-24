@@ -61,30 +61,30 @@ namespace Nov2019.Scenes
 
         public override void Draw(Renderer renderer)
         {
-
-            renderer.Begin();
+            renderer.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             ObjectsManager.Draw(renderer);
-            renderer.End();
 
-            renderer.Begin();
+            renderer.Begin2D();
             ObjectsManager.DrawUI(renderer);
 
             SpriteFont font = Fonts.FontCica_32;
             string text;
             Vector2 size;
 
-            text = "オブジェクト数 : " + ObjectsManager.objectCount;
-            size = font.MeasureString(text);
-            renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 0f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
+            if (MyDebug.DebugMode)
+            {
+                text = "オブジェクト数 : " + ObjectsManager.objectCount;
+                size = font.MeasureString(text) ;
+                renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 0f * Screen.ScreenSize), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One * Screen.ScreenSize);
 
-            text = "パーティクル数 : " + ObjectsManager.particleCount;
-            size = font.MeasureString(text);
-            renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 1f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
+                text = "パーティクル数 : " + ObjectsManager.particleCount;
+                size = font.MeasureString(text) ;
+                renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 1f * Screen.ScreenSize), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One * Screen.ScreenSize);
 
-            text = "FPS値 : " + frameCounter.FPS.ToString("0.00").PadLeft(3, ' ');
-            size = font.MeasureString(text);
-            renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 2f), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One);
-
+                text = "FPS値 : " + frameCounter.FPS.ToString("0.00").PadLeft(3, ' ');
+                size = font.MeasureString(text);
+                renderer.DrawString(font, text, new Vector2(Screen.WIDTH, Screen.HEIGHT - size.Y * 2f * Screen.ScreenSize), Color.White, 0, new Vector2(size.X, size.Y), Vector2.One * Screen.ScreenSize);
+            }
             renderer.End();
 
             base.Draw(renderer);

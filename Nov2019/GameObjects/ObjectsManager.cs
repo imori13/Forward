@@ -112,12 +112,33 @@ namespace Nov2019.GameObjects
 
         public void Draw(Renderer renderer)
         {
-            particles.ForEach(p => p.Draw(renderer, Camera));
+            particles.ForEach(p =>
+            {
+                if (p is Particle3D)
+                {
+                    if (Vector3.DistanceSquared(Player.Position, (p as Particle3D).Position) <= 1500f * 1500f)
+                    {
+                        p.Draw(renderer, Camera);
+                    }
+                }
+                else
+                {
+                    p.Draw(renderer, Camera);
+                }
+            });
+
             gameobjects.ForEach(g =>
             {
                 if (Vector3.DistanceSquared(Player.Position, g.Position) <= 1500f * 1500f)
                 {
                     g.Draw(renderer);
+                }
+                else
+                {
+                    if (g.GameObjectTag == GameObjectTag.BossEnemy)
+                    {
+                        g.Draw(renderer);
+                    }
                 }
             });
 
@@ -144,9 +165,14 @@ namespace Nov2019.GameObjects
                 {
                     g.IsDead = true;
 
-                    for(int i = 0; i < 4; i++)
+                    for (int i = 0; i < 4; i++)
                     {
                         AddParticle(new SmokeParticle3D(g.Position, rand));
+                    }
+
+                    for (int i = 0; i < 2; i++)
+                    {
+                        AddParticle(new Spark_Particle3D(g.Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
                     }
                 }
             });

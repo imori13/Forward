@@ -28,8 +28,16 @@ namespace Nov2019.GameObjects
         float fireTime;
         static readonly float fireLimit = 0.01f;
 
-        public bool PlayerRightClickMode { get; private set; }
+        static readonly int MAX_HITPOINT = 5;
+        public int HitPoint { get; private set; }
 
+        public bool PlayerAimMode { get; private set; }
+
+        public bool InvincibleFlag { get; private set; }    // 被弾時の無敵用フラグ
+        static readonly int invincibleLimit = 4;
+        float invincibleTime;
+
+        Color color;
 
         // 角度をベクトルに変換するプロパティ
         public Vector3 AngleVec3
@@ -45,13 +53,15 @@ namespace Nov2019.GameObjects
 
         public Player()
         {
-            Collider = new CircleCollider(this, 10);
+            Collider = new CircleCollider(this, 0.1f);
             GameObjectTag = GameObjectTag.Player;
         }
 
         public override void Initialize()
         {
             fireTime = fireLimit;
+            color = Color.White;
+            HitPoint = MAX_HITPOINT;
         }
 
         public override void Update()
@@ -59,11 +69,12 @@ namespace Nov2019.GameObjects
             Move();
             Rotation();
             UpdateListPos();
+            InvincibleManage();
 
             // 左クリック押してるか
             // 押してたら攻撃する
             shotTime += Time.deltaTime;
-            if (Input.IsLeftMouseHold())
+            if (Input.IsLeftMouseHold() || Input.GetRightTriggerButton(0) >= 0.5f)
             {
                 if (shotTime >= shotLimit)
                 {
@@ -75,25 +86,9 @@ namespace Nov2019.GameObjects
                     ObjectsManager.AddGameObject(new PlayerBullet(Position - i * 1, AngleVec3), false);
                 }
             }
-            else if(Input.IsLeftMouseUp())
+            else
             {
                 shotTime = 0;
-            }
-
-            // 右クリック押してるか
-            PlayerRightClickMode = Input.IsRightMouseHold();
-
-            if (Input.GetKeyDown(Keys.G))
-            {
-                for (int i = 0; i < 50f; i++)
-                {
-                    ObjectsManager.AddParticle(new Spark_Particle3D(Position + AngleVec3 * 10f, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
-                }
-
-                for (int i = 0; i < 25; i++)
-                {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position + AngleVec3 * 10f, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
-                }
             }
         }
 
@@ -107,7 +102,7 @@ namespace Nov2019.GameObjects
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("boat", "boat_red", Camera, world);
+            renderer.Draw3D("boat", "boat_red", color, Camera, world);
         }
 
         public override void DrawUI(Renderer renderer)
@@ -116,50 +111,64 @@ namespace Nov2019.GameObjects
             string text;
             Vector2 size;
 
-            text = "プレイヤー座標 X:" + Position.X.ToString("0000.00") + " Y:" + Position.Y.ToString("0000.00") + " Z:" + Position.Z.ToString("0000.00");
-            size = font.MeasureString(text);
-            renderer.DrawString(font, text, new Vector2(Screen.WIDTH / 2f, size.Y / 2f + size.Y * 0f), Color.White, 0, size / 2f, Vector2.One);
+            for (int i = 0; i < MAX_HITPOINT; i++)
+            {
+                string assetName = (HitPoint <= i) ? ("HPdeath_icon") : ("HPalive_icon");
+                renderer.Draw2D(assetName, new Vector2(80 * Screen.ScreenSize + (i * 80 * Screen.ScreenSize), 60 * Screen.ScreenSize), Color.White, MathHelper.ToRadians(-45), Vector2.One * 40, Vector2.One * 0.8f * Screen.ScreenSize);
+            }
 
-            text = "空間分割座標 : " + CurrentRootPos;
-            size = font.MeasureString(text);
-            renderer.DrawString(font, text, new Vector2(Screen.WIDTH / 2f, size.Y / 2f + size.Y * 1f), Color.White, 0, size / 2f, Vector2.One);
+            if (MyDebug.DebugMode)
+            {
+                text = "プレイヤー座標 { X:" + Position.X.ToString("0000.00") + " , Z:" + Position.Z.ToString("0000.00") + " } ";
+                size = font.MeasureString(text);
+                renderer.DrawString(font, text, new Vector2(0, size.Y / 2f * Screen.ScreenSize + size.Y * 0f * Screen.ScreenSize), Color.White, 0, new Vector2(0, size.Y / 2f), Vector2.One * Screen.ScreenSize);
+
+                text = "空間分割座標 : " + CurrentRootPos;
+                size = font.MeasureString(text);
+                renderer.DrawString(font, text, new Vector2(0, size.Y / 2f * Screen.ScreenSize + size.Y * 1f * Screen.ScreenSize), Color.White, 0, new Vector2(0, size.Y / 2f), Vector2.One * Screen.ScreenSize);
+
+                text = "プレイヤー被弾数 : " + HitPoint;
+                size = font.MeasureString(text);
+                renderer.DrawString(font, text, new Vector2(0, size.Y / 2f * Screen.ScreenSize + size.Y * 2f * Screen.ScreenSize), Color.White, 0, new Vector2(0, size.Y / 2f), Vector2.One * Screen.ScreenSize);
+
+                text = "プレイヤー無敵フラグ : " + InvincibleFlag;
+                size = font.MeasureString(text);
+                renderer.DrawString(font, text, new Vector2(0, size.Y / 2f * Screen.ScreenSize + size.Y * 3f * Screen.ScreenSize), Color.White, 0, new Vector2(0, size.Y / 2f), Vector2.One * Screen.ScreenSize);
+            }
         }
 
         public override void HitAction(GameObject gameObject)
         {
+            bool returnFlag = (ObjectsManager.BossEnemy.isWait) || (InvincibleFlag);
+            if (returnFlag) { return; }
 
+            if (gameObject.GameObjectTag == GameObjectTag.DamageCollision)
+            {
+                HitPoint = Math.Max(HitPoint - 1, 0);
+
+                InvincibleFlag = true;
+                Time.HitStop();
+                Camera.Shake(5, 1, 0.95f);
+            }
         }
 
         // プレイヤーの移動処理
         private void Move()
         {
-            // 移動・回転
+            // 移動
+            destVelocity = AngleVec3 * movespeed;
+            fireTime += Time.deltaTime;
 
-            if (Input.GetKey(Keys.Space) ||
-            Input.GetLeftTriggerButton(0) > 0.5f ||
-            Input.GetRightTriggerButton(0) > 0.5f ||
-            Input.IsPadButtonHold(Buttons.LeftShoulder, 0) ||
-            Input.IsPadButtonHold(Buttons.RightShoulder, 0))
+            if (fireTime >= fireLimit)
             {
-                destVelocity = AngleVec3 * movespeed;
-                fireTime += Time.deltaTime;
-
-                if (fireTime >= fireLimit)
-                {
-                    fireTime = 0;
-                    Random rand = GameDevice.Instance().Random;
-                    ObjectsManager.AddParticle(new RocketFire_Particle3D(Position - AngleVec3 * 4f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.15f, rand));
-                }
-            }
-            else
-            {
-                fireTime = fireLimit;
-                destVelocity *= 0.995f;
+                fireTime = 0;
+                Random rand = GameDevice.Instance().Random;
+                ObjectsManager.AddParticle(new RocketFire_Particle3D(Position - AngleVec3 * 4f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.15f, rand));
             }
 
             Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.deltaSpeed);
 
-            Position += Velocity *Time.deltaSpeed;
+            Position += Velocity * Time.deltaSpeed;
 
             Vector3 offset = new Vector3(10, 0, 10);
 
@@ -196,14 +205,18 @@ namespace Nov2019.GameObjects
         {
             destRotateX = 0;
 
-            rotateSpeed = (PlayerRightClickMode) ? (1.0f) : (1.5f);
+            rotateSpeed = (PlayerAimMode) ? (1.0f) : (1.5f);
 
-            if (Input.GetKey(Keys.D) || Input.GetRightStickState(0).X > 0.5f || Input.GetLeftStickState(0).X > 0.5f || (PlayerRightClickMode && (Input.GetMousePosition().X - Screen.WIDTH / 2f) > 0.1f))
+
+            // 右クリック押してるか
+            PlayerAimMode = Input.IsRightMouseHold() || Input.GetLeftTriggerButton(0) >= 0.5f;
+
+            if (Input.GetKey(Keys.D) || Input.GetLeftStickState(0).X > 0.5f || (PlayerAimMode && (Input.GetMousePosition().X - Screen.WIDTH / 2) > 0.1f))
             {
                 destAngle += rotateSpeed * Time.deltaSpeed;
                 destRotateX = 25;
             }
-            if (Input.GetKey(Keys.A) || Input.GetRightStickState(0).X < -0.5f || Input.GetLeftStickState(0).X < -0.5f || (PlayerRightClickMode && (Input.GetMousePosition().X - Screen.WIDTH / 2f) < -0.1f))
+            if (Input.GetKey(Keys.A) || Input.GetLeftStickState(0).X < -0.5f || (PlayerAimMode && (Input.GetMousePosition().X - Screen.WIDTH / 2) < -0.1f))
             {
                 destAngle -= rotateSpeed * Time.deltaSpeed;
                 destRotateX = -25;
@@ -213,6 +226,25 @@ namespace Nov2019.GameObjects
             rotateX = MathHelper.Lerp(rotateX, destRotateX, 0.05f * Time.deltaSpeed);
             // 船のヨー回転(左右回転)
             Angle = MathHelper.Lerp(Angle, destAngle, 0.1f * Time.deltaSpeed);
+        }
+
+        void InvincibleManage()
+        {
+            if (InvincibleFlag)
+            {
+                invincibleTime += Time.deltaTime;
+
+
+                color = (invincibleTime % 0.05f <= 0.025f) ? (color = Color.Black) : (color = Color.White);
+
+                if (invincibleTime >= invincibleLimit)
+                {
+                    InvincibleFlag = false;
+                    invincibleTime = 0;
+
+                    color = Color.White;
+                }
+            }
         }
     }
 }

@@ -10,43 +10,14 @@ namespace Nov2019.GameObjects.BossAttackModules
 {
     class Missile_AM : AttackModule
     {
-        int count;
-        float time;
-        static readonly float limit = 0.025f;
-        static readonly int countLimit = 10;
-
-        float deathTime;
-        float deathLimit = 5;
-
-        public Missile_AM(BossEnemy BossEnemy) : base(BossEnemy)
+        public Missile_AM(BossEnemy BossEnemy) : base(BossEnemy, "Missile_icon", 0.025f,10,8)
         {
-            time = -1;
-            deathTime = 0;
+
         }
 
-        public override void Attack()
+        public override void Shot()
         {
-            if (count >= countLimit)
-            {
-                deathTime += Time.deltaTime;
-
-                if (deathTime >= deathLimit)
-                {
-                    IsEndFlag = true;
-                }
-            }
-            else
-            {
-                time += Time.deltaTime;
-
-                if (time >= limit)
-                {
-                    time = 0;
-                    count++;
-
-                    ObjectsManager.AddGameObject(new Missile_Bullet(BossEnemy.Position, MyMath.RandomCircleVec3()), false);
-                }
-            }
+            ObjectsManager.AddGameObject(new Missile_Bullet(BossEnemy.Position, MyMath.RandomCircleVec3()), false);
         }
     }
 }

@@ -11,50 +11,28 @@ namespace Nov2019.GameObjects.BossAttackModules
 {
     class AntiAir_AM : AttackModule
     {
-        int count;
-        int limit =25;
-
-        float shotTime;
-        float shotLimit = 0.1f;
-
-        float deathTime;
-        float deathLimit = 3;
-
-        public AntiAir_AM(BossEnemy BossEnemy) : base(BossEnemy)
+        public AntiAir_AM(BossEnemy BossEnemy) : base(BossEnemy, "AntiAir_icon", 0.1f, 25, 3)
         {
-            count = 0;
-            shotTime = -1f;
+
         }
 
         public override void Attack()
         {
-            if (Vector3.DistanceSquared(ObjectsManager.Player.Position, BossEnemy.Position) <= 400 * 400)
+            if (Vector3.DistanceSquared(BossEnemy.Position, ObjectsManager.Player.Position) <= 500 * 500)
             {
-                IsEndFlag = true;
+                Initialize();
+
                 return;
             }
 
-            if (count >= limit)
-            {
-                deathTime += Time.deltaTime;
-                if (deathTime >= deathLimit)
-                {
-                    IsEndFlag = true;
-                }
-            }
-            else
-            {
-                shotTime += Time.deltaTime;
-                if (shotTime >= shotLimit)
-                {
-                    count++;
-                    shotTime = 0;
+            base.Attack();
+        }
 
-                    ObjectsManager.AddGameObject(new AntiAir_BossBullet(BossEnemy.Position), false);
-                    ObjectsManager.AddGameObject(new AntiAir_BossBullet(BossEnemy.Position + (BossEnemy as BossEnemy).AngleVec3 * 50), false);
-                    ObjectsManager.AddGameObject(new AntiAir_BossBullet(BossEnemy.Position + (BossEnemy as BossEnemy).AngleVec3 * 100), false);
-                }
-            }
+        public override void Shot()
+        {
+            ObjectsManager.AddGameObject(new AntiAir_BossBullet(BossEnemy.Position), false);
+            ObjectsManager.AddGameObject(new AntiAir_BossBullet(BossEnemy.Position + (BossEnemy as BossEnemy).AngleVec3 * 50), false);
+            ObjectsManager.AddGameObject(new AntiAir_BossBullet(BossEnemy.Position + (BossEnemy as BossEnemy).AngleVec3 * 100), false);
         }
     }
 }

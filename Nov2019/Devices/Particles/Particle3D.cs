@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace Nov2019.Devices.Particles
 {
     // エフェクトの基本パラメータを描いた、抽象クラス
-    abstract class Particle3D: Particle
+    abstract class Particle3D : Particle
     {
         protected string modelName; // Modelのアセットの名前。Rendererに格納されてるDictionaryデータのKeyの名前
         protected Color modelColor; // モデルのカラー。textureとは共存できない。両方nullでないならtexture優先
 
-        protected Vector3 position; // エフェクトの座標
+        public Vector3 Position { get; protected set; } // エフェクトの座標
         protected Vector3 direction; // エフェクトの移動する角度  度数->Vector2にしたいならStaticのCalculationクラスのAngleToVelocityを使うか同じ処理書いて。
         protected float speed;  // エフェクトの移動する際の移動量の速度。 velocity*speed 
         protected float friction;   // エフェクトの移動する際の摩擦 speed*frictionする。0.95fとかそういう値
@@ -48,7 +48,7 @@ namespace Nov2019.Devices.Particles
             this.modelName = modelName;
             this.modelColor = modelColor;
             this.aliveLimit = aliveLimit;
-            this.position = position;
+            this.Position = position;
             this.direction = direction;
             this.speed = speed;
             this.friction = friction;
@@ -85,7 +85,7 @@ namespace Nov2019.Devices.Particles
             speed -= (speed - (speed * friction)) * Time.deltaSpeed;
 
             // 座標=移動角度*速度
-            position += direction * speed * Time.deltaSpeed;
+            Position += direction * speed * Time.deltaSpeed;
         }
 
         public override void Draw(Renderer renderer, Camera camera)
@@ -95,7 +95,7 @@ namespace Nov2019.Devices.Particles
                 Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X)) *
                 Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z)) *
-                Matrix.CreateWorld(position + origin, Vector3.Forward, Vector3.Up);
+                Matrix.CreateWorld(Position + origin, Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D(
             modelName,

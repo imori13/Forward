@@ -24,7 +24,7 @@ namespace Nov2019.Devices
 
         // カメラ描画情報
         private float fogS = 0;
-        private float fogE = 1000;
+        private float fogE = 1500;
         private Color fogColor = new Color(50, 40, 50);
         private Vector3 AmbientLightColor = Vector3.One * 0.5f;
         private Vector3 EmissiveColor = Vector3.One * 0.25f;
@@ -41,7 +41,7 @@ namespace Nov2019.Devices
         }
 
         // 描画開始
-        public void Begin()
+        public void Begin3D()
         {
             spriteBatch.Begin(
                   SpriteSortMode.Deferred,
@@ -51,6 +51,11 @@ namespace Nov2019.Devices
                   RasterizerState.CullCounterClockwise,
                   null,
                   null);
+        }
+
+        public void Begin2D()
+        {
+            spriteBatch.Begin();
         }
 
         // 描画終了
@@ -132,7 +137,7 @@ namespace Nov2019.Devices
         }
 
         // テクスチャを指定してModelに貼る。描画処理
-        public void Draw3D(string modelName, string modelTexture, Camera camera, Matrix world)
+        public void Draw3D(string modelName, string modelTexture, Camera camera, Matrix world, bool fogFlag = true)
         {
             Debug.Assert(models.ContainsKey(modelName), "指定したAssetName[" + modelName + " ]または[ " + modelTexture + " ]がロードされていません。");
 
@@ -153,7 +158,7 @@ namespace Nov2019.Devices
                     effect.View = camera.View;
                     effect.Projection = camera.Projection;
 
-                    effect.FogEnabled = true;
+                    effect.FogEnabled = fogFlag;
                     effect.FogStart = fogS;
                     effect.FogEnd = fogE;
                     effect.FogColor = fogColor.ToVector3();
@@ -173,7 +178,7 @@ namespace Nov2019.Devices
         }
 
         // 色を指定してモデルに色を塗る。描画処理
-        public void Draw3D(string modelName, Color color, Camera camera, Matrix world)
+        public void Draw3D(string modelName, Color color, Camera camera, Matrix world, bool fogFlag = true)
         {
             Debug.Assert(models.ContainsKey(modelName), "指定したAssetName[" + modelName + " ]がロードされていません。");
 
@@ -195,7 +200,7 @@ namespace Nov2019.Devices
                     effect.View = camera.View;
                     effect.Projection = camera.Projection;
 
-                    effect.FogEnabled = true;
+                    effect.FogEnabled = fogFlag;
                     effect.FogStart = fogS;
                     effect.FogEnd = fogE;
                     effect.FogColor = fogColor.ToVector3();
@@ -211,7 +216,7 @@ namespace Nov2019.Devices
         }
 
         // テクスチャを指定してModelに貼る。描画処理
-        public void Draw3D(string modelName, string modelTexture,Color color, Camera camera, Matrix world)
+        public void Draw3D(string modelName, string modelTexture, Color color, Camera camera, Matrix world, bool fogFlag = true)
         {
             Debug.Assert(models.ContainsKey(modelName), "指定したAssetName[" + modelName + " ]または[ " + modelTexture + " ]がロードされていません。");
 
@@ -232,7 +237,7 @@ namespace Nov2019.Devices
                     effect.View = camera.View;
                     effect.Projection = camera.Projection;
 
-                    effect.FogEnabled = true;
+                    effect.FogEnabled = fogFlag;
                     effect.FogStart = fogS;
                     effect.FogEnd = fogE;
                     effect.FogColor = fogColor.ToVector3();

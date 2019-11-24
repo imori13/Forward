@@ -92,7 +92,7 @@ namespace Nov2019.GameObjects.Bullets
                 {
                     IsDead = true;
 
-                    ObjectsManager.AddGameObject(new DamageCollision(Position), false);
+                    ObjectsManager.AddGameObject(new DamageCollision(Position,100), false);
 
                     for (int i = 0; i < 10; i++)
                     {

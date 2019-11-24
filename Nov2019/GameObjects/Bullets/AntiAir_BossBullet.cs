@@ -66,6 +66,7 @@ namespace Nov2019.GameObjects.Bullets
             if (currentDistance >= prevDistance)
             {
                 IsDead = true;
+                ObjectsManager.AddGameObject(new DamageCollision(Position, 30), false);
 
                 for (int i = 0; i < 25; i++)
                 {
@@ -76,12 +77,6 @@ namespace Nov2019.GameObjects.Bullets
                 {
                     ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
                 }
-            }
-
-            if (Vector3.DistanceSquared(ObjectsManager.Player.Position, Position) >= 1000 * 1000)
-            {
-                IsDead = true;
-                ObjectsManager.AddGameObject(new DamageCollision(Position), false);
             }
 
             prevDistance = currentDistance;

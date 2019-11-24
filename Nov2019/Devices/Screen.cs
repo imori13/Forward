@@ -60,21 +60,21 @@ namespace Nov2019.Devices
 
             if (Input.GetKey(Keys.OemPlus))
             {
-                DestScreenSize += 0.025f;
+                DestScreenSize += 0.025f * Time.deltaNormalSpeed;
             }
 
             if (Input.GetKey(Keys.OemMinus))
             {
-                DestScreenSize -= 0.025f;
+                DestScreenSize -= 0.025f * Time.deltaNormalSpeed;
             }
 
             DestScreenSize = MathHelper.Clamp(DestScreenSize, 0.25f, 0.9f);
 
-            ScreenSize = MathHelper.Lerp(ScreenSize, DestScreenSize, 0.05f);
+            ScreenSize = MathHelper.Lerp(ScreenSize, DestScreenSize, 0.05f * Time.deltaNormalSpeed);
 
-            width = MathHelper.Lerp(width, MaxWidth * DestScreenSize, 0.05f);
-            height = MathHelper.Lerp(height, MaxHeight * DestScreenSize, 0.05f);
-            
+            width = MathHelper.Lerp(width, MaxWidth * DestScreenSize, 0.05f * Time.deltaNormalSpeed);
+            height = MathHelper.Lerp(height, MaxHeight * DestScreenSize, 0.05f * Time.deltaNormalSpeed);
+
             WIDTH = (int)Math.Ceiling(width);
             HEIGHT = (int)Math.Ceiling(height);
 

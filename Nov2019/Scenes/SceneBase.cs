@@ -54,7 +54,7 @@ namespace Nov2019.SceneDevices
         public virtual void Draw(Renderer renderer)
         {
             Color color = new Color(150,150,150);
-            renderer.Begin();
+            renderer.Begin3D();
             renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, Screen.HEIGHT), color, 0, new Vector2(0.5f, 1), InSize);
             renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 0), color, 0, new Vector2(0.5f, 0), OutSize);
             renderer.End();

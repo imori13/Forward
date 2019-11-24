@@ -23,8 +23,8 @@ namespace Nov2019.Devices.Particles
                 MyMath.RandF(1, 2) * 0.25f,
                 position + direction * MyMath.RandF(0, 5),
                 direction,
-                MyMath.RandF(15, 25) * 0.01f,  // speed
-                0.95f,   // friction
+                MyMath.RandF(30,50) * 0.01f,  // speed
+                0.8f,   // friction
                 Vector3.One * MyMath.RandF(5, 10) * 0.1f,  // scale
                 Vector3.Zero,   // rotation
                 Vector3.Zero,  // rotationspeed
@@ -39,15 +39,15 @@ namespace Nov2019.Devices.Particles
         {
             base.Initialize();
 
-            initscale = new Vector3(2, 2, 2);
+            initscale = new Vector3(1,1,1);
         }
 
         public override void Update()
         {
             base.Update();
 
-            initPos = Vector3.Lerp(initPos, position, 0.1f*Time.deltaSpeed);
-            scale = Vector3.Lerp(initscale, new Vector3(Vector3.Distance(initPos, position), 0, 0) * 0.25f, aliveRate);
+            initPos = Vector3.Lerp(initPos, Position, 0.1f*Time.deltaSpeed);
+            scale = Vector3.Lerp(initscale, new Vector3(Vector3.Distance(initPos, Position), 0, 0) * 0.25f, aliveRate);
         }
         public override void Draw(Renderer renderer, Camera camera)
         {
@@ -68,7 +68,7 @@ namespace Nov2019.Devices.Particles
                 Matrix.CreateWorld(Vector3.Left, Vector3.Forward, Vector3.Up) *
             Matrix.CreateScale(scale) *
                 Matrix.CreateFromAxisAngle(cross, (float)rad) *
-                Matrix.CreateWorld(position, Vector3.Forward, Vector3.Up);
+                Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D(
             modelName,

@@ -47,7 +47,7 @@ namespace Nov2019.Devices.Particles
         {
             base.Update();
 
-            position += Vector3.Up * upY * Time.deltaSpeed;
+            Position += Vector3.Up * upY * Time.deltaSpeed;
 
             scale = Vector3.Lerp(initScale, Vector3.Zero, GetAliveRate());
         }

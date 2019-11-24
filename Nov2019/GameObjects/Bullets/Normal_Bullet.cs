@@ -35,14 +35,14 @@ namespace Nov2019.GameObjects.Bullets
             velocity = direction * moveSpeed;
             Position += direction * 20;
 
-            aliveLimit = MyMath.RandF(4,5);
+            aliveLimit = MyMath.RandF(4, 5);
         }
 
         public override void Update()
         {
             Position += velocity * Time.deltaSpeed;
 
-            particleTime +=  Time.deltaTime;
+            particleTime += Time.deltaTime;
             if (particleTime >= particleLimit)
             {
                 particleTime = 0;
@@ -57,7 +57,7 @@ namespace Nov2019.GameObjects.Bullets
             {
                 IsDead = true;
 
-                ObjectsManager.AddGameObject(new DamageCollision(Position), false);
+                ObjectsManager.AddGameObject(new DamageCollision(Position, 30), false);
 
                 for (int i = 0; i < 10; i++)
                 {

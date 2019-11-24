@@ -11,39 +11,54 @@ namespace Nov2019.GameObjects.Bullets
 {
     class DamageCollision : GameObject
     {
+        int maxScale;
         float scale;
-        bool flag;
+        float aliveTime;
+        static readonly float aliveLimit = 0.1f;
+        Vector3 rotation;
+        Vector3 rotation_speed;
 
-        public DamageCollision(Vector3 position)
+        public DamageCollision(Vector3 position, int maxScale)
         {
             Position = position;
-            scale = 50;
+            this.maxScale = maxScale;
+            scale = maxScale;
             Collider = new CircleCollider(this, scale);
             GameObjectTag = GameObjectTag.DamageCollision;
+
+            rotation = new Vector3(MyMath.RandF(360), MyMath.RandF(360), MyMath.RandF(360));
+            float speed = 10;
+            rotation_speed = new Vector3(MyMath.RandF(-speed, speed), MyMath.RandF(-speed, speed), MyMath.RandF(-speed, speed));
         }
 
         public override void Initialize()
         {
-            flag = false;
+
         }
 
         public override void Update()
         {
-            // １フレーム死亡をスキップ
-            if (flag)
+            Collider = new CircleCollider(this, scale);
+            UpdateListPos();
+
+            rotation += rotation_speed * Time.deltaSpeed;
+
+            aliveTime += Time.deltaTime;
+            if (aliveTime >= aliveLimit)
             {
                 IsDead = true;
             }
-            flag = true;
+
+            scale = Easing2D.BackInOut(aliveTime, aliveLimit, maxScale, 0, 1);
         }
 
         public override void Draw(Renderer renderer)
         {
             Matrix world =
                 Matrix.CreateScale(scale) *
-                Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(0)) *
-                Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(rotation.X)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(rotation.Y)) *
+                Matrix.CreateRotationZ(MathHelper.ToRadians(rotation.Z)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D("LowSphere", Color.Red * 0.5f, Camera, world);

@@ -72,9 +72,13 @@ namespace Nov2019.Devices
             gameTime = gameDevice.GameTime;
 
             // 時間停止状態なら演出カメラ
-            if (Time.StopTimeMode && Time.stopTime >= 2.0f)
+            if (Time.TimeStopMode && Time.timeStopTime >= 2.0f)
             {
                 View = TimeStopView();
+            }
+            else if (Time.BossBreakStopMode && Time.bossBreakStopTime >= 1.0f)
+            {
+                View = BossBreakView();
             }
             // 通常カメラ
             else
@@ -83,9 +87,6 @@ namespace Nov2019.Devices
             }
 
             //View = Matrix.Lerp(View, DebugView(), 0.1f * Time.Speed);
-
-            // マウスを画面の中心に置く
-            Input.SetMousePosition(Screen.WIDTH / 2, Screen.HEIGHT / 2);
         }
 
         // 振動コピペURL
@@ -96,7 +97,7 @@ namespace Nov2019.Devices
             float destZoom = 100f;
 
             destViewPoint = player.Position;
-            if (player.PlayerRightClickMode)
+            if (player.PlayerAimMode)
             {
                 destZoom = 30f;
                 destCameraPosLatitude = 10;
@@ -115,14 +116,31 @@ namespace Nov2019.Devices
             }
             else
             {
-                destCameraPosLatitude += (Input.GetMousePosition().Y - Screen.HEIGHT / 2f) * 0.5f * Time.deltaSpeed;
-                destCameraPosLatitude = MathHelper.Clamp(destCameraPosLatitude, -20, 20);
+                // コントローラー
+                if (Input.GetRightStickState(0) != Vector2.Zero)
+                {
+                    destCameraPosLatitude += -Input.GetRightStickState(0).Y * 4 * Time.deltaNormalSpeed;
 
-                destCameraPosLongitude += (Input.GetMousePosition().X - Screen.WIDTH / 2f) * 0.5f * Time.deltaSpeed;
+                    destCameraPosLongitude += Input.GetRightStickState(0).X * 4 * Time.deltaNormalSpeed;
+                }
+                // マウス
+                else
+                {
+                    destCameraPosLatitude += (Input.GetMousePosition().Y - Screen.HEIGHT / 2) * 0.5f * Time.deltaNormalSpeed;
+
+                    destCameraPosLongitude += (Input.GetMousePosition().X - Screen.WIDTH / 2) * 0.5f * Time.deltaNormalSpeed;
+                }
+
+                destCameraPosLatitude = MathHelper.Clamp(destCameraPosLatitude, -20, 20);
             }
 
-            currentCameraPosLatitude = MathHelper.Lerp(currentCameraPosLatitude, destCameraPosLatitude, 0.25f * Time.deltaSpeed);
-            currentCameraPosLongitude = MathHelper.Lerp(currentCameraPosLongitude, destCameraPosLongitude, 0.25f * Time.deltaSpeed);
+            if (Time.HitStopMode)
+            {
+                destZoom = 250f;
+            }
+
+            currentCameraPosLatitude = MathHelper.Lerp(currentCameraPosLatitude, destCameraPosLatitude, 0.25f * Time.deltaNormalSpeed);
+            currentCameraPosLongitude = MathHelper.Lerp(currentCameraPosLongitude, destCameraPosLongitude, 0.25f * Time.deltaNormalSpeed);
 
             // カメラをプレイヤーの後ろに追従するように設定
             cameraPosAngleVec3 = Vector3.Lerp(
@@ -131,13 +149,13 @@ namespace Nov2019.Devices
                     (float)Math.Cos(MathHelper.ToRadians(currentCameraPosLongitude)),
                     (float)Math.Sin(MathHelper.ToRadians(currentCameraPosLatitude)),
                     (float)Math.Sin(MathHelper.ToRadians(currentCameraPosLongitude))),
-                    1.0f * Time.deltaSpeed);
+                    1.0f * Time.deltaNormalSpeed);
 
-            zoom = MathHelper.Lerp(zoom, destZoom, 0.1f * Time.deltaSpeed);
+            zoom = MathHelper.Lerp(zoom, destZoom, 0.1f * Time.deltaNormalSpeed);
 
             Position = player.Position + (cameraPosAngleVec3 * zoom);
 
-            cameraview_viewpoint = Vector3.Lerp(cameraview_viewpoint, destViewPoint, 0.1f * Time.deltaSpeed);
+            cameraview_viewpoint = Vector3.Lerp(cameraview_viewpoint, destViewPoint, 0.1f * Time.deltaNormalSpeed);
 
             if (shaking)
             {
@@ -173,7 +191,7 @@ namespace Nov2019.Devices
             Vector3 timestop_viewpoint = Vector3.Zero;
             float distance = 0;
             float yPos = 0;
-            if (Time.stopTime <= 5)
+            if (Time.timeStopTime <= 5)
             {
                 timestop_viewpoint = ObjectsManager.BossEnemy.Position;
                 distance = 100;
@@ -186,7 +204,30 @@ namespace Nov2019.Devices
                 yPos = 10;
             }
 
-            cameraPosAngle += 1 * Time.deltaSpeed;
+            cameraPosAngle += 0.1f * Time.deltaNormalSpeed;
+
+            Vector2 vec2 = MyMath.DegToVec2(cameraPosAngle);
+            Vector3 vec3 = new Vector3(vec2.X, 0, vec2.Y);
+            vec3.Normalize();
+
+            Position = timestop_viewpoint + (vec3 * distance) + (Vector3.Up * yPos);
+
+            Matrix matrix = Matrix.CreateLookAt(Position, timestop_viewpoint, Vector3.Up);
+
+            return matrix;
+        }
+
+        Matrix BossBreakView()
+        {
+            Vector3 timestop_viewpoint = Vector3.Zero;
+            float distance = 0;
+            float yPos = 0;
+
+            timestop_viewpoint = ObjectsManager.BossEnemy.Position;
+            distance = 200;
+            yPos = 40;
+
+            cameraPosAngle += 0.1f * Time.deltaNormalSpeed;
 
             Vector2 vec2 = MyMath.DegToVec2(cameraPosAngle);
             Vector3 vec3 = new Vector3(vec2.X, 0, vec2.Y);
