@@ -10,7 +10,7 @@ namespace Nov2019.GameObjects.BossAttackModules
 {
     class Missile_AM : AttackModule
     {
-        public Missile_AM(BossEnemy BossEnemy) : base(BossEnemy, "Missile_icon", 0.025f,10,8)
+        public Missile_AM(BossEnemy BossEnemy, float shotLimit, int countLimit, float waitLimit) : base(BossEnemy, "Missile_icon", shotLimit, countLimit, waitLimit)
         {
 
         }

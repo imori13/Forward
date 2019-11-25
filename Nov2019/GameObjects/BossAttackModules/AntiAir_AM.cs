@@ -11,19 +11,19 @@ namespace Nov2019.GameObjects.BossAttackModules
 {
     class AntiAir_AM : AttackModule
     {
-        public AntiAir_AM(BossEnemy BossEnemy) : base(BossEnemy, "AntiAir_icon", 0.1f, 25, 3)
+        public AntiAir_AM(BossEnemy BossEnemy, float shotLimit, int countLimit, float waitLimit) : base(BossEnemy, "AntiAir_icon", shotLimit, countLimit, waitLimit)
         {
 
         }
 
         public override void Attack()
         {
-            if (Vector3.DistanceSquared(BossEnemy.Position, ObjectsManager.Player.Position) <= 500 * 500)
-            {
-                Initialize();
+            //if (Vector3.DistanceSquared(BossEnemy.Position, ObjectsManager.Player.Position) <= 500 * 500)
+            //{
+            //    Initialize();
 
-                return;
-            }
+            //    return;
+            //}
 
             base.Attack();
         }

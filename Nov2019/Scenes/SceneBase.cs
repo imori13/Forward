@@ -11,7 +11,7 @@ namespace Nov2019.SceneDevices
 {
     abstract class SceneBase
     {
-        public bool IsEndFlag { get; private set; } // これsetをprivate以外にしないで
+        public bool IsEndFlag { get; protected set; } // これsetをprivate以外にしないで
         public bool ShutDown { get; protected set; } // shundownをtrueにしたら終了するようになる
 
         public bool StartFlag { get; set; }
@@ -38,12 +38,12 @@ namespace Nov2019.SceneDevices
         {
             if (!StartFlag)
             {
-                InSize = Vector2.Lerp(InSize, new Vector2(Screen.WIDTH, 0), 0.1f);
+                InSize = Vector2.Lerp(InSize, new Vector2(Screen.WIDTH, 0), 0.05f * Time.deltaNormalSpeed);
             }
 
             if (ShutDown)
             {
-                OutSize = Vector2.Lerp(OutSize, new Vector2(Screen.WIDTH, Screen.HEIGHT), 0.1f);
+                OutSize = Vector2.Lerp(OutSize, new Vector2(Screen.WIDTH, Screen.HEIGHT), 0.05f * Time.deltaNormalSpeed);
 
                 if (Vector2.Distance(OutSize, new Vector2(Screen.WIDTH, Screen.HEIGHT)) <= 0.1f)
                 {
@@ -53,8 +53,8 @@ namespace Nov2019.SceneDevices
         }
         public virtual void Draw(Renderer renderer)
         {
-            Color color = new Color(150,150,150);
-            renderer.Begin3D();
+            Color color = new Color(50, 50, 50);
+            renderer.Begin2D();
             renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, Screen.HEIGHT), color, 0, new Vector2(0.5f, 1), InSize);
             renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 0), color, 0, new Vector2(0.5f, 0), OutSize);
             renderer.End();

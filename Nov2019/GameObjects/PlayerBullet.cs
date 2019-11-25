@@ -20,15 +20,15 @@ namespace Nov2019.GameObjects
             this.Position = Position;
             this.direction = direction;
 
+            GameObjectTag = GameObjectTag.PlayerBullet;
+
             Collider = new CircleCollider(this, 3);
         }
 
         public override void Initialize()
         {
             speed = 20;
-
-            GameObjectTag = GameObjectTag.PlayerBullet;
-
+            
             Vector2 distance = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(direction.Z, direction.X)) + MyMath.RandF(-1, 1));
             direction += new Vector3(distance.Y, 0, distance.X);
 
@@ -80,12 +80,12 @@ namespace Nov2019.GameObjects
 
                 for (int i = 0; i < 2; i++)
                 {
-                    ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                    ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), MyMath.RandF(0, 5), GameDevice.Instance().Random));
                 }
 
                 for (int i = 0; i < 1; i++)
                 {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
+                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), MyMath.RandF(0,5), 5, GameDevice.Instance().Random));
                 }
             }
         }

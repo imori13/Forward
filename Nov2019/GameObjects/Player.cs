@@ -19,7 +19,7 @@ namespace Nov2019.GameObjects
         float rotateX;  // 船が傾く描写
         float destRotateX;
         Vector3 destVelocity;   // 目標移動量
-        static readonly float movespeed = 2f;
+        static readonly float movespeed = 3f;
         float rotateSpeed;
 
         float shotTime;
@@ -31,7 +31,7 @@ namespace Nov2019.GameObjects
         static readonly int MAX_HITPOINT = 5;
         public int HitPoint { get; private set; }
         public bool DeathFlag { get; private set; }
-        float deathTime;    
+        float deathTime;
         float deathLimit;   // 爆発するまでの時間
 
         public bool PlayerAimMode { get; private set; }
@@ -56,15 +56,27 @@ namespace Nov2019.GameObjects
 
         public Player()
         {
-            Collider = new CircleCollider(this, 0.1f);
+            Collider = new CircleCollider(this, 1f);
             GameObjectTag = GameObjectTag.Player;
         }
 
         public override void Initialize()
         {
+            Position = Vector3.Zero;
+            shotTime = 0;
+            DeathFlag = false;
+            deathTime = 0;
             fireTime = fireLimit;
             color = Color.White;
             HitPoint = MAX_HITPOINT;
+            Angle = 0;
+            destAngle = 0;
+            rotateX = 0;
+            Velocity = Vector3.Zero;
+            destVelocity = Vector3.Zero;
+            InvincibleFlag = false;
+            invincibleTime = 0;
+            CurrentRootPos = uint.MaxValue;
         }
 
         public override void Update()
@@ -76,10 +88,18 @@ namespace Nov2019.GameObjects
 
             if (Input.GetKeyDown(Keys.G))
             {
-                HitPoint--;
-                if (0 <= HitPoint)
+                HitPoint = Math.Max(HitPoint - 1, 0);
+                if (HitPoint <= 0)
                 {
                     DeathFlag = true;
+                    Time.PlayerDeathStopTime();
+                    Camera.Shake(10, 5, 0.99f);
+                }
+                else
+                {
+                    InvincibleFlag = true;
+                    Time.HitStop();
+                    Camera.Shake(5, 1, 0.95f);
                 }
             }
 
@@ -94,6 +114,9 @@ namespace Nov2019.GameObjects
                     {
                         shotTime = 0;
 
+                        Random rand = GameDevice.Instance().Random;
+                        GameDevice.Instance().Sound.PlaySE("PlayerShot0" + rand.Next(1,5).ToString());
+
                         Vector2 a = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(AngleVec3.Z, AngleVec3.X)) + 90f);
                         Vector3 i = new Vector3(a.Y, 0, a.X);
                         ObjectsManager.AddGameObject(new PlayerBullet(Position + i * 1, AngleVec3), false);
@@ -106,7 +129,6 @@ namespace Nov2019.GameObjects
                 }
             }
 
-
             if (deathTime >= deathLimit)
             {
 
@@ -115,15 +137,29 @@ namespace Nov2019.GameObjects
 
         public override void Draw(Renderer renderer)
         {
+            if (DeathFlag) { return; }
+
             // 描画
             Matrix world =
-                Matrix.CreateScale(1) *
-                Matrix.CreateRotationX(MathHelper.ToRadians(rotateX)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(90 - Angle)) *
-                Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
+                Matrix.CreateScale(0.75f) *
+                Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
+                Matrix.CreateRotationZ(MathHelper.ToRadians(rotateX)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(180 - Angle)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("boat", "boat_red", color, Camera, world);
+            renderer.Draw3D("Player", "PlayerTexture", color, Camera, world);
+
+            if (MyDebug.DebugMode)
+            {
+                Matrix www =
+               Matrix.CreateScale((Collider as CircleCollider).Radius) *
+               Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
+               Matrix.CreateRotationY(MathHelper.ToRadians(0)) *
+               Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
+               Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
+
+                renderer.Draw3D("LowSphere", Color.Red, Camera, www);
+            }
         }
 
         public override void DrawUI(Renderer renderer)
@@ -166,10 +202,20 @@ namespace Nov2019.GameObjects
             if (gameObject.GameObjectTag == GameObjectTag.DamageCollision)
             {
                 HitPoint = Math.Max(HitPoint - 1, 0);
-                DeathFlag = HitPoint <= 0;
-                InvincibleFlag = true;
-                Time.HitStop();
-                Camera.Shake(5, 1, 0.95f);
+                if (HitPoint <= 0)
+                {
+                    GameDevice.Instance().Sound.StopBGM();
+                    DeathFlag = true;
+                    Time.PlayerDeathStopTime();
+                    Camera.Shake(5, 3, 0.96f);
+                }
+                else
+                {
+                    GameDevice.Instance().Sound.PauseBGM();
+                    InvincibleFlag = true;
+                    Time.HitStop();
+                    Camera.Shake(5, 1, 0.95f);
+                }
             }
         }
 
@@ -186,7 +232,7 @@ namespace Nov2019.GameObjects
                 {
                     fireTime = 0;
                     Random rand = GameDevice.Instance().Random;
-                    ObjectsManager.AddParticle(new RocketFire_Particle3D(Position - AngleVec3 * 4f, -AngleVec3 + MyMath.RandomCircleVec3() * 0.15f, rand));
+                    ObjectsManager.AddParticle(new RocketFire_Particle3D(Position - AngleVec3 * 6, -AngleVec3 + MyMath.RandomCircleVec3() * 0.15f, rand));
                 }
 
                 Velocity = Vector3.Lerp(Velocity, destVelocity, 0.1f * Time.deltaSpeed);
@@ -233,7 +279,7 @@ namespace Nov2019.GameObjects
 
 
             // 右クリック押してるか
-            PlayerAimMode = (Input.IsRightMouseHold() || Input.GetLeftTriggerButton(0) >= 0.5f)&&!DeathFlag;
+            PlayerAimMode = (Input.IsRightMouseHold() || Input.GetLeftTriggerButton(0) >= 0.5f) && !DeathFlag;
 
             if (!DeathFlag)
             {

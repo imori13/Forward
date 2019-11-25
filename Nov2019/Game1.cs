@@ -63,20 +63,44 @@ namespace Nov2019
             renderer.LoadTexture("HPdeath_icon", "Textures/");  
             renderer.LoadTexture("Boss_icon", "Textures/");  
             renderer.LoadTexture("Cross_icon", "Textures/");  
+            renderer.LoadTexture("STAGECLEAR_TEXT", "Textures/");
+            renderer.LoadTexture("GAMECLEAR_TEXT", "Textures/");
+            renderer.LoadTexture("THANKYOU_FOR_PLAYING_TEXT", "Textures/");  
+            renderer.LoadTexture("SPACEHOLD_TO_RETURN_TEXT", "Textures/");  
+            renderer.LoadTexture("GAMEOVER_TEXT", "Textures/");  
 
+            renderer.Load3D("Player", "Models/");
             renderer.Load3D("boat", "Models/");
             renderer.Load3D("cube", "Models/");
             renderer.Load3D("LowSphere", "Models/");
             renderer.Load3D("Missile", "Models/");
             renderer.Load3D("Mine", "Models/");
+            renderer.Load3D("Boss", "Models/");
 
+            renderer.LoadTexture("PlayerTexture", "ModelTextures/");
             renderer.LoadTexture("MineTexture", "ModelTextures/");
             renderer.LoadTexture("boat_red", "ModelTextures/");
             renderer.LoadTexture("boat_blue", "ModelTextures/");
             renderer.LoadTexture("MissileTexture", "ModelTextures/");
+            renderer.LoadTexture("BossTexture", "ModelTextures/");
 
             Sound sound = GameDevice.Instance().Sound;
-
+            sound.LoadSE("PlayerShot01", "Sounds/");
+            sound.LoadSE("PlayerShot02", "Sounds/");
+            sound.LoadSE("PlayerShot03", "Sounds/");
+            sound.LoadSE("PlayerShot04", "Sounds/");
+            sound.LoadSE("Explosion01", "Sounds/");
+            sound.LoadSE("Explosion02", "Sounds/");
+            sound.LoadSE("Explosion03", "Sounds/");
+            sound.LoadSE("Explosion04", "Sounds/");
+            sound.LoadSE("BariaHit01", "Sounds/");
+            sound.LoadSE("BariaHit02", "Sounds/");
+            sound.LoadSE("BariaHit03", "Sounds/");
+            sound.LoadSE("BariaBreak", "Sounds/");
+            
+            sound.LoadBGM("bgm_maoudamashii_8bit09", "BGMs/");
+            sound.PlayBGM("bgm_maoudamashii_8bit09");
+            sound.StopBGM();
 
             sceneManager.AddScene(SceneEnum.GameScene, new GameScene());
 
@@ -102,8 +126,7 @@ namespace Nov2019
             Input.SetMousePosition(Screen.WIDTH / 2, Screen.HEIGHT / 2);
 
             MyDebug.Update();
-
-
+            
             base.Update(gameTime);
         }
 

@@ -25,17 +25,25 @@ namespace Nov2019.Devices
         public static bool BossBreakStopMode { get; private set; }
         public static float bossBreakStopTime { get; private set; }
         public static readonly float bossBreakStopLimit = 4f;
+        public static bool PlayerDeathStopMode { get; private set; }
 
         public static void Initialize()
         {
             time = 1;
             TimeStopMode = false;
+            HitStopMode = false;
+            BossBreakStopMode = false;
+            PlayerDeathStopMode = false;
+            timeStopTime = 0;
+            hitStopTime = 0;
+            bossBreakStopTime = 0;
         }
 
         public static void Update()
         {
             dest = (Input.GetKey(Keys.T)) ? (0.2f) : (1.00f);
 
+            
             if (TimeStopMode)
             {
                 timeStopTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
@@ -50,50 +58,36 @@ namespace Nov2019.Devices
                     GameDevice.Instance().Sound.ResumeBGM();
                 }
             }
-
-            if (HitStopMode)
+            else if (PlayerDeathStopMode)
             {
-                if (TimeStopMode)
+                dest = 0.1f;
+            }
+            else if (HitStopMode)
+            {
+                hitStopTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
+
+                dest = 0.01f;
+
+                if (hitStopTime >= hitStioLimit)
                 {
                     hitStopTime = 0;
                     HitStopMode = false;
-                }
-                else
-                {
-                    hitStopTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
 
-                    dest = 0.01f;
-
-                    if (hitStopTime >= hitStioLimit)
-                    {
-                        hitStopTime = 0;
-                        HitStopMode = false;
-
-                        GameDevice.Instance().Sound.ResumeBGM();
-                    }
+                    GameDevice.Instance().Sound.ResumeBGM();
                 }
             }
-
-            if (BossBreakStopMode)
+            else if (BossBreakStopMode)
             {
-                if (TimeStopMode || HitStopMode)
+                bossBreakStopTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
+
+                dest = 0.01f;
+
+                if (bossBreakStopTime >= bossBreakStopLimit)
                 {
-                    bossBreakStopTime = 0;
                     BossBreakStopMode = false;
-                }
-                else
-                {
-                    bossBreakStopTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
+                    bossBreakStopTime = 0;
 
-                    dest = 0.01f;
-
-                    if (bossBreakStopTime >= bossBreakStopLimit)
-                    {
-                        BossBreakStopMode = false;
-                        bossBreakStopTime = 0;
-
-                        GameDevice.Instance().Sound.ResumeBGM();
-                    }
+                    GameDevice.Instance().Sound.ResumeBGM();
                 }
             }
 
@@ -127,6 +121,12 @@ namespace Nov2019.Devices
         {
             BossBreakStopMode = true;
             time = 0.01f;
+        }
+
+        public static void PlayerDeathStopTime()
+        {
+            PlayerDeathStopMode = true;
+            time = 0;
         }
     }
 }

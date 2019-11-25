@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Nov2019.Devices;
 using Nov2019.Devices.Collision;
 using Nov2019.Devices.Particles;
@@ -32,8 +33,7 @@ namespace Nov2019.GameObjects
         public List<AttackModule> AttackModules { get; private set; } = new List<AttackModule>();
         public MoveModule MoveModule { get; private set; }
 
-        public float DestAngle
-        { get; set; }
+        public float DestAngle { get; set; }
         public float Angle { get; private set; }    // 向く角度
         float fireTime;
         float fireLimit = 0.05f;
@@ -54,7 +54,6 @@ namespace Nov2019.GameObjects
         float bariaAlpha;   // バリアの透明地
         float bariaRotateY;
         float bariaDestRotateY;
-        Color bariaColor;
 
         float healRebootTime;
         static readonly float healRebootLimit = 3;
@@ -70,6 +69,19 @@ namespace Nov2019.GameObjects
 
         Color bossHPColor;
 
+        bool StageClearFlag;
+        float stageClearTime;
+        float stageClearHeight;
+        float stageClearTextAlpha;
+
+        bool bariaHitSoundFlag;
+        float bariaHitSoundTime;
+        float bariaHitSOundLimit = 0.05f;
+
+        public bool GAMECLAER_FLAG { get; private set; }
+
+        bool initBGMFlag;
+
         // 角度をベクトルに変換するプロパティ
         public Vector3 AngleVec3
         {
@@ -84,22 +96,44 @@ namespace Nov2019.GameObjects
 
         public BossEnemy()
         {
-            Position = new Vector3(0, 0, -500);
             Collider = new CircleCollider(this, 50);
             GameObjectTag = GameObjectTag.BossEnemy;
         }
 
         public override void Initialize()
         {
+            CurrentRootPos = uint.MaxValue;
+            Position = new Vector3(0, 0, -500);
             BossState = BossStateEnum.Stage01;
             AttackModules.Clear();
             MoveModule = new None_MM(this);
-
             isWait = true;
+            isHeal = true;
             BossHP = 100;
-            collscale = 50;
+            collscale = MIN_COLLSCALE;
             bossColor = Color.White;
             bariaDestRotateY = 0;
+            GAMECLAER_FLAG = false;
+            StageClearFlag = false;
+            stageClearTime = 0;
+            stageClearHeight = 0;
+            stageClearTextAlpha = 0;
+            invincibleTime = 0;
+            InvincibleFlag = false;
+            DamageCount = 0;
+            DamageSumCount = 0;
+            healRebootTime = 0;
+            bariaAlpha = 0;
+            bariaRotateY = 0;
+            bariaDestRotateY = 0;
+            offsetDestScale = 0;
+            offsetScale = 0;
+            DestAngle = 0;
+            Angle = 0;
+            fireTime = 0;
+            DestVelocity = Vector3.Zero;
+            waitTime = 0;
+            initBGMFlag = false;
         }
 
         public override void Update()
@@ -127,31 +161,48 @@ namespace Nov2019.GameObjects
 
             bossColor = Color.Lerp(bossColor, (isWait) ? (Color.Gray) : (Color.White), 0.1f * Time.deltaSpeed);
 
-            bariaColor = Color.Lerp(bariaColor, (isWait||InvincibleFlag) ? (Color.Gray) : (Color.Green), 0.1f * Time.deltaSpeed);
-
             bariaRotateY = MathHelper.Lerp(bariaRotateY, bariaDestRotateY, 0.1f * Time.deltaSpeed);
             offsetDestScale = MathHelper.Lerp(offsetDestScale, 0, 0.1f * Time.deltaSpeed);
             offsetScale = MathHelper.Lerp(offsetScale, offsetDestScale, 0.5f * Time.deltaSpeed);
 
             Angle = MathHelper.Lerp(Angle, DestAngle, 0.05f * Time.deltaSpeed);
 
+            if (Input.GetKey(Keys.H))
+            {
+                BossHP -= 2 * Time.deltaNormalSpeed;
+            }
+
+            bariaHitSoundTime += Time.deltaTime;
+            if (bariaHitSoundFlag)
+            {
+                if (bariaHitSoundTime >= bariaHitSOundLimit)
+                {
+                    Random rand = GameDevice.Instance().Random;
+                    GameDevice.Instance().Sound.PlaySE("BariaHit0" + rand.Next(1, 4).ToString());
+                    bariaHitSoundTime = 0;
+                    bariaHitSoundFlag = false;
+                }
+            }
+
             ClampPosition();
         }
 
         public override void Draw(Renderer renderer)
         {
+            if (GAMECLAER_FLAG) { return; }
+
             // 描画
             Matrix world;
             world =
-                Matrix.CreateScale(10) *
+                Matrix.CreateScale(5) *
                 Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
-                Matrix.CreateRotationY(MathHelper.ToRadians(90 - Angle)) *
+                Matrix.CreateRotationY(MathHelper.ToRadians(180 - Angle)) *
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("boat", "boat_blue", bossColor, Camera, world, false);
+            renderer.Draw3D("Boss", "BossTexture", bossColor, Camera, world, false);
 
-            if (isWait) { return; }
+            if (isWait || InvincibleFlag) { return; }
 
             world =
                 Matrix.CreateScale(collscale + offsetScale) *
@@ -160,7 +211,7 @@ namespace Nov2019.GameObjects
                 Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
-            renderer.Draw3D("LowSphere", bariaColor * bariaAlpha, Camera, world);
+            renderer.Draw3D("LowSphere", Color.DeepSkyBlue * bariaAlpha, Camera, world);
         }
 
         public override void DrawUI(Renderer renderer)
@@ -170,13 +221,13 @@ namespace Nov2019.GameObjects
             Vector2 size;
 
             // ボスのステージ内のステージのHPのUI
-            Vector2 offset = Vector2.One * 5 * Screen.ScreenSize;
-            renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 105 * Screen.ScreenSize), Color.Black, MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(800, 20) * Screen.ScreenSize + offset);
+            Vector2 offset = Vector2.One * 10 * Screen.ScreenSize;
+            renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 105 * Screen.ScreenSize), Color.Black, MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(749, 9) * Screen.ScreenSize + offset);
             if (!isWait)
             {
                 Color destColor = (InvincibleFlag) ? (new Color(50, 50, 50)) : (new Color(200, 200, 200));
                 bossHPColor = Color.Lerp(bossHPColor, destColor, 0.1f * Time.deltaSpeed);
-                renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 105 * Screen.ScreenSize), bossHPColor, MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(Easing2D.CircOut(BossHP, 100, 0, 800), 20) * Screen.ScreenSize);
+                renderer.Draw2D("Pixel", new Vector2(Screen.WIDTH / 2f, 105 * Screen.ScreenSize), bossHPColor, MathHelper.ToRadians(0), Vector2.One * 0.5f, new Vector2(Easing2D.CircOut(BossHP, 100, 0, 750), 9) * Screen.ScreenSize);
             }
 
             // ボスのステージのUI
@@ -246,6 +297,9 @@ namespace Nov2019.GameObjects
                 }
             }
 
+            // StageClearUI
+            StageClearUI(renderer);
+
             if (MyDebug.DebugMode)
             {
                 float distance = Vector3.Distance(Position, ObjectsManager.Player.Position);
@@ -277,6 +331,7 @@ namespace Nov2019.GameObjects
 
             if (gameObject.GameObjectTag == GameObjectTag.PlayerBullet)
             {
+                bariaHitSoundFlag = true;
                 BossHP -= 0.75f;
                 bariaDestRotateY += 90;
                 isHeal = false;
@@ -323,6 +378,8 @@ namespace Nov2019.GameObjects
             {
                 isWait = true;
 
+                GameDevice.Instance().Sound.PlaySE("BariaBreak");
+
                 AttackModules.Clear();
                 MoveModule = new None_MM(this);
 
@@ -333,7 +390,6 @@ namespace Nov2019.GameObjects
                 BossHP = 100;
                 collscale = MIN_COLLSCALE;
 
-                Time.BossBreakStop();
                 Camera.Shake(2, 1, 0.95f);
 
                 // ダメージカウントをインクリメント
@@ -351,18 +407,23 @@ namespace Nov2019.GameObjects
                 if (DamageCount >= damageCountLimit)
                 {
                     Time.TimeStop();
+                    StageClearFlag = true;
 
                     DamageCount = 0;
+
                     // もし最終段階だったら、ボスは死ぬ
-                    if ((int)BossState == 3)
+                    if ((int)BossState == 2)
                     {
-                        IsDead = true;
+                        Time.PlayerDeathStopTime();
+                        GAMECLAER_FLAG = true;
+                        GameDevice.Instance().Sound.StopBGM();
                     }
-                    else
-                    {
-                        // 次の段階へ
-                        BossState++;
-                    }
+
+                    BossState++;
+                }
+                else
+                {
+                    Time.BossBreakStop();
                 }
             }
         }
@@ -382,11 +443,14 @@ namespace Nov2019.GameObjects
                 {
                     isWait = false;
                     waitTime = 0;
-                    AttackModules.Add(new CrossMine_AM(this));
-                    AttackModules.Add(new Missile_AM(this));
-                    AttackModules.Add(new AntiAir_AM(this));
+                    AttackModules.Add(new CircleMine_AM(this));
+                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 50, 20));
                     MoveModule = new CircleRandom_MM(this);
-                    HousyaAttack();
+                    if (!initBGMFlag)
+                    {
+                        initBGMFlag = true;
+                        GameDevice.Instance().Sound.PlayBGM("bgm_maoudamashii_8bit09");
+                    }
                 }
             }
         }
@@ -406,9 +470,9 @@ namespace Nov2019.GameObjects
                 {
                     isWait = false;
                     waitTime = 0;
-                    AttackModules.Add(new CrossMine_AM(this));
+                    AttackModules.Add(new CircleMine_AM(this));
+                    AttackModules.Add(new CrossMine_AM(this, 0.025f, 30, 15));
                     MoveModule = new CircleRandom_MM(this);
-                    HousyaAttack();
                 }
             }
         }
@@ -428,23 +492,10 @@ namespace Nov2019.GameObjects
                 {
                     isWait = false;
                     waitTime = 0;
-                    AttackModules.Add(new CrossMine_AM(this));
+                    AttackModules.Add(new CircleMine_AM(this));
+                    AttackModules.Add(new CrossMine_AM(this, 0.25f, 30, 10));
                     MoveModule = new CircleRandom_MM(this);
-                    HousyaAttack();
                 }
-            }
-        }
-
-        void HousyaAttack()
-        {
-            Random rand = GameDevice.Instance().Random;
-
-            for (int i = 0; i < 360; i += 5)
-            {
-                Vector2 vec2 = MyMath.DegToVec2(i);
-                float randY = MyMath.RandF(-1, 1) * 0.1f;
-                Vector3 vec3 = new Vector3(vec2.Y, randY, vec2.X);
-                ObjectsManager.AddGameObject(new Mine_Bullet(Position, vec3, rand.Next(50, 100) * 0.1f), false);
             }
         }
 
@@ -488,6 +539,44 @@ namespace Nov2019.GameObjects
                     InvincibleFlag = false;
                     bossColor = Color.White;
                 }
+            }
+        }
+
+        void StageClearUI(Renderer renderer)
+        {
+            if (StageClearFlag)
+            {
+                stageClearTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
+                float inLimit = 1, waitLimit = 5, outLimit = 1;
+                float sumLimit = inLimit + waitLimit + outLimit;
+
+                float maxHeight = 110;
+                if (stageClearTime <= inLimit)
+                {
+                    stageClearHeight = Easing2D.CircInOut(stageClearTime, inLimit, 0, maxHeight);
+                    stageClearTextAlpha = Easing2D.CircInOut(stageClearTime, inLimit, 0, 1);
+                }
+                else if (stageClearTime <= inLimit + waitLimit)
+                {
+                    stageClearHeight = maxHeight;
+                }
+                else if (stageClearTime <= sumLimit)
+                {
+                    stageClearHeight = Easing2D.CircInOut(stageClearTime - inLimit - waitLimit, outLimit, maxHeight, 0);
+                    stageClearTextAlpha = Easing2D.CircInOut(stageClearTime - inLimit - waitLimit, outLimit, 1, 0);
+                }
+                else
+                {
+                    StageClearFlag = false;
+                    stageClearTime = 0;
+                }
+
+                Vector2 offset = new Vector2(0, 300) * Screen.ScreenSize;
+                renderer.Draw2D("Pixel", Screen.Vec2 / 2f + offset, Color.White, 0, Vector2.One * 0.5f, new Vector2(Screen.WIDTH, stageClearHeight));
+                renderer.Draw2D(
+                    "STAGECLEAR_TEXT", Screen.Vec2 / 2f + offset,
+                    new Color(MyMath.RandF(0, 100) / 255f, MyMath.RandF(0, 100) / 255f, MyMath.RandF(0, 100) / 255f) * stageClearTextAlpha,
+                    MathHelper.ToRadians(0), new Vector2(496, 48), new Vector2(1, stageClearHeight / maxHeight) * Screen.ScreenSize);
             }
         }
     }

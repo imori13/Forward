@@ -28,6 +28,7 @@ namespace Nov2019.GameObjects.Bullets
         public Mine_Bullet(Vector3 position, Vector3 direction, float moveSpeed)
         {
             GameObjectTag = GameObjectTag.EnemyBullet;
+            Collider = new CircleCollider(this, 7);
             Position = position;
             this.direction = direction;
             this.moveSpeed = moveSpeed;
@@ -46,6 +47,8 @@ namespace Nov2019.GameObjects.Bullets
 
         public override void Update()
         {
+            UpdateListPos();
+
             Position += direction * moveSpeed * Time.deltaSpeed;
 
             moveSpeed -= delay * Time.deltaSpeed;
@@ -64,19 +67,7 @@ namespace Nov2019.GameObjects.Bullets
             aliveTime += Time.deltaTime;
             if (aliveTime >= aliveLimit)
             {
-                IsDead = true;
-
-                ObjectsManager.AddGameObject(new DamageCollision(Position,50), false);
-
-                for (int i = 0; i < 8; i++)
-                {
-                    ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
-                }
-
-                for (int i = 0; i < 8; i++)
-                {
-                    ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), 5, GameDevice.Instance().Random));
-                }
+                Bom();
             }
 
             rotation += rotation_speed * Time.deltaSpeed;
@@ -93,6 +84,18 @@ namespace Nov2019.GameObjects.Bullets
                 Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D("Mine", "MineTexture", Camera, world);
+
+            if (MyDebug.DebugMode)
+            {
+                Matrix www =
+               Matrix.CreateScale((Collider as CircleCollider).Radius) *
+               Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
+               Matrix.CreateRotationY(MathHelper.ToRadians(0)) *
+               Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
+               Matrix.CreateWorld(Position, Vector3.Forward, Vector3.Up);
+
+                renderer.Draw3D("LowSphere", Color.Red, Camera, www);
+            }
         }
 
         public override void DrawUI(Renderer renderer)
@@ -102,7 +105,31 @@ namespace Nov2019.GameObjects.Bullets
 
         public override void HitAction(GameObject gameObject)
         {
+            if (gameObject.GameObjectTag == GameObjectTag.Player)
+            {
+                Bom();
+                Camera.Shake(5, 1, 0.95f);
+            }
+        }
 
+        void Bom()
+        {
+            IsDead = true;
+
+            Random rand = GameDevice.Instance().Random;
+            GameDevice.Instance().Sound.PlaySE("Explosion0"+rand.Next(1,5).ToString());
+
+            ObjectsManager.AddGameObject(new DamageCollision(Position, 50), false);
+
+            for (int i = 0; i < 8; i++)
+            {
+                ObjectsManager.AddParticle(new Spark_Particle3D(Position, MyMath.RandomCircleVec3(), MyMath.RandF(30, 60), GameDevice.Instance().Random));
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                ObjectsManager.AddParticle(new ExplosionParticle3D(Position, MyMath.RandomCircleVec3(), MyMath.RandF(30, 60), 5, GameDevice.Instance().Random));
+            }
         }
     }
 }

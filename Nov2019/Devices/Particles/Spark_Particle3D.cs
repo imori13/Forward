@@ -16,12 +16,13 @@ namespace Nov2019.Devices.Particles
         public Spark_Particle3D(
             Vector3 position,
             Vector3 direction,
+            float distance,
             Random rand
             ) : base(
                 "cube",
                 Color.Lerp(Color.Yellow, Color.White, (float)rand.NextDouble()),
                 MyMath.RandF(1, 2) * 0.25f,
-                position + direction * MyMath.RandF(0, 5),
+                position + direction * distance,
                 direction,
                 MyMath.RandF(30,50) * 0.01f,  // speed
                 0.8f,   // friction

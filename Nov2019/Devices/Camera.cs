@@ -51,6 +51,11 @@ namespace Nov2019.Devices
 
         public Camera()
         {
+            Initialize();
+        }
+
+        public void Initialize()
+        {
             Position = Vector3.Zero;
 
             Projection = Matrix.CreatePerspectiveFieldOfView(
@@ -137,6 +142,10 @@ namespace Nov2019.Devices
             if (Time.HitStopMode)
             {
                 destZoom = 250f;
+            }
+            else if (Time.PlayerDeathStopMode && !Time.TimeStopMode)
+            {
+                destZoom = 400f;
             }
 
             currentCameraPosLatitude = MathHelper.Lerp(currentCameraPosLatitude, destCameraPosLatitude, 0.25f * Time.deltaNormalSpeed);

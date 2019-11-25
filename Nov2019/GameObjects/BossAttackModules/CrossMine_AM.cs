@@ -13,7 +13,7 @@ namespace Nov2019.GameObjects.BossAttackModules
     {
         float initBossAngle;
 
-        public CrossMine_AM(BossEnemy BossEnemy) : base(BossEnemy, "Mine_icon", 0.05f, 20,5)
+        public CrossMine_AM(BossEnemy BossEnemy,float shotLimit,int countLimit,float waitLimit) : base(BossEnemy, "Mine_icon", shotLimit, countLimit, waitLimit)
         {
             initBossAngle = BossEnemy.Angle;
         }

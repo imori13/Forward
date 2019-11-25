@@ -85,7 +85,6 @@
     <Compile Include="GameObjects\Bullets\DamageCollision.cs" />
     <Compile Include="GameObjects\Bullets\Mine_Bullet.cs" />
     <Compile Include="GameObjects\Bullets\Missile_Bullet.cs" />
-    <Compile Include="GameObjects\Bullets\Normal_Bullet.cs" />
     <Compile Include="GameObjects\Star.cs" />
     <Compile Include="GameObjects\GameObject.cs" />
     <Compile Include="GameObjects\GameObjectTag.cs" />

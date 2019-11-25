@@ -15,17 +15,18 @@ namespace Nov2019.Devices.Particles
         public ExplosionParticle3D(
             Vector3 position,
             Vector3 direction,
+            float distance,
             float speed,
             Random random)
             : base(
                   "cube",
                   Color.Lerp(Color.Red, Color.Orange, random.Next(100) / 100f),
                   random.Next(0, 3) + (float)random.NextDouble(),
-                  position,    // position
+                  position + direction * distance,    // position
                   direction,
                   MyMath.RandF(0, speed),  //speed
                   0.9f,
-                  Vector3.One * random.Next(300, 500) / 100f, //scale
+                  Vector3.One * random.Next(300, 750) / 100f, //scale
                   new Vector3(
                       random.Next(360) + (float)random.NextDouble(),
                       random.Next(360) + (float)random.NextDouble(),

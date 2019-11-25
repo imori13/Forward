@@ -1,4 +1,5 @@
-﻿using Nov2019.Devices;
+﻿using Microsoft.Xna.Framework;
+using Nov2019.Devices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,14 +58,23 @@ namespace Nov2019.GameObjects.BossAttackModules
                 }
             }
 
+
             // クールタイム
             if (CoolTimeFlag)
             {
                 CoolTime += Time.deltaTime;
                 if (CoolTime >= CoolTimeLimit)
                 {
-                    CoolTime = 0;
-                    CoolTimeFlag = false;
+                    // プレイヤーが死んでいたら行わない
+                    if (!ObjectsManager.Player.DeathFlag)
+                    {
+                        CoolTime = 0;
+                        CoolTimeFlag = false;
+                    }
+                    else
+                    {
+                        CoolTime = MathHelper.Clamp(CoolTime, 0, CoolTimeLimit);
+                    }
                 }
 
                 return;

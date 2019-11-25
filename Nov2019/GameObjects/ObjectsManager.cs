@@ -51,24 +51,25 @@ namespace Nov2019.GameObjects
 
             gameobjects.Clear();
             particles.Clear();
+            addGameObjects.Clear();
             addParticles.Clear();
         }
 
         public void AddGameObject(GameObject gameobject, bool offsetFlag)
         {
             if (gameobject == null) { return; }
+            
+            gameobject.ObjectsManager = this;
+            gameobject.Camera = Camera;
+            gameobject.Initialize();
 
             if (offsetFlag)
             {
                 gameobject.Position += OffsetPosition;
             }
 
-            gameobject.ObjectsManager = this;
-            gameobject.Camera = Camera;
             gameobject.UpdateListPos();
             addGameObjects.Add(gameobject);
-
-            gameobject.Initialize();
 
             if (gameobject is Player)
             {
@@ -172,7 +173,7 @@ namespace Nov2019.GameObjects
 
                     for (int i = 0; i < 2; i++)
                     {
-                        AddParticle(new Spark_Particle3D(g.Position, MyMath.RandomCircleVec3(), GameDevice.Instance().Random));
+                        AddParticle(new Spark_Particle3D(g.Position, MyMath.RandomCircleVec3(), MyMath.RandF(0,30), GameDevice.Instance().Random));
                     }
                 }
             });
