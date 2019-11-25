@@ -68,6 +68,11 @@ namespace Nov2019
             renderer.LoadTexture("THANKYOU_FOR_PLAYING_TEXT", "Textures/");  
             renderer.LoadTexture("SPACEHOLD_TO_RETURN_TEXT", "Textures/");  
             renderer.LoadTexture("GAMEOVER_TEXT", "Textures/");  
+            renderer.LoadTexture("LbuttonUI", "Textures/");  
+            renderer.LoadTexture("RbuttonUI", "Textures/");  
+            renderer.LoadTexture("LStickUI", "Textures/");  
+            renderer.LoadTexture("RStickUI", "Textures/");  
+            renderer.LoadTexture("SPACEPUSH_TO_START", "Textures/");  
 
             renderer.Load3D("Player", "Models/");
             renderer.Load3D("boat", "Models/");

@@ -44,6 +44,7 @@ namespace Nov2019.GameObjects
 
         public override void Update()
         {
+            UpdateListPos();
             Velocity = direction * speed;
 
             Position += Velocity * Time.deltaSpeed;

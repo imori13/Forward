@@ -35,13 +35,13 @@ namespace Nov2019.GameObjects.Bullets
             player = ObjectsManager.Player;
 
             float distance = Vector3.Distance(player.Position, Position);
-            speed = MyMath.RandF(2, 4);
+            speed = MyMath.RandF(6, 8);
 
             // 時間 = 距離 / 速さ
             float time = distance / speed;
 
             // プレイヤーの 移動速度*時間 かける
-            explosionPosition = (player.Position + player.Velocity * time) + MyMath.RandomCircleVec3() * MyMath.RandF(100);
+            explosionPosition = (player.Position + player.AngleVec3 * Player.movespeed * time) + MyMath.RandomCircleVec3() * MyMath.RandF(100);
 
             direction = explosionPosition - Position;
             direction.Normalize();
@@ -97,6 +97,15 @@ namespace Nov2019.GameObjects.Bullets
                 Matrix.CreateWorld(Position + new Vector3(0, 0.9f, 0), Vector3.Forward, Vector3.Up);
 
             renderer.Draw3D("cube", Color.Black, Camera, world);
+
+            Matrix aaa =
+              Matrix.CreateScale(3) *
+              Matrix.CreateRotationX(MathHelper.ToRadians(0)) *
+              Matrix.CreateRotationY(MathHelper.ToRadians(0)) *
+              Matrix.CreateRotationZ(MathHelper.ToRadians(0)) *
+              Matrix.CreateWorld(explosionPosition, Vector3.Forward, Vector3.Up);
+
+            renderer.Draw3D("LowSphere", Color.Red * 0.3f, Camera, aaa);
 
             if (MyDebug.DebugMode)
             {

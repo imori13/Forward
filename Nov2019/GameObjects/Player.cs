@@ -19,7 +19,7 @@ namespace Nov2019.GameObjects
         float rotateX;  // 船が傾く描写
         float destRotateX;
         Vector3 destVelocity;   // 目標移動量
-        static readonly float movespeed = 3f;
+        public static readonly float movespeed = 3f;
         float rotateSpeed;
 
         float shotTime;
@@ -31,8 +31,6 @@ namespace Nov2019.GameObjects
         static readonly int MAX_HITPOINT = 5;
         public int HitPoint { get; private set; }
         public bool DeathFlag { get; private set; }
-        float deathTime;
-        float deathLimit;   // 爆発するまでの時間
 
         public bool PlayerAimMode { get; private set; }
 
@@ -40,7 +38,11 @@ namespace Nov2019.GameObjects
         static readonly int invincibleLimit = 4;
         float invincibleTime;
 
+        public bool GAMESTART_FLAG { get; private set; }
+
         Color color;
+
+        public float ShakeValue;
 
         // 角度をベクトルに変換するプロパティ
         public Vector3 AngleVec3
@@ -62,10 +64,11 @@ namespace Nov2019.GameObjects
 
         public override void Initialize()
         {
-            Position = Vector3.Zero;
+            ShakeValue = 0;
+            Position = new Vector3(0, 0, 1000);
             shotTime = 0;
             DeathFlag = false;
-            deathTime = 0;
+            GAMESTART_FLAG = false;
             fireTime = fireLimit;
             color = Color.White;
             HitPoint = MAX_HITPOINT;
@@ -81,10 +84,23 @@ namespace Nov2019.GameObjects
 
         public override void Update()
         {
+            if (!GAMESTART_FLAG)
+            {
+                Time.TitleStopMode = true;
+                if (Input.GetKeyDown(Keys.Space) || Input.IsPadButtonDown(Buttons.A, 0) || Input.IsPadButtonDown(Buttons.B, 0))
+                {
+                    Time.TitleStopMode = false;
+                    GAMESTART_FLAG = true;
+                }
+            }
+
             Move();
             Rotation();
             UpdateListPos();
             InvincibleManage();
+
+            ShakeValue = MathHelper.Lerp(ShakeValue, 0, 0.1f * Time.deltaNormalSpeed);
+            Input.SetVibration(0, ShakeValue);
 
             if (Input.GetKeyDown(Keys.G))
             {
@@ -94,12 +110,14 @@ namespace Nov2019.GameObjects
                     DeathFlag = true;
                     Time.PlayerDeathStopTime();
                     Camera.Shake(10, 5, 0.99f);
+                    ShakeValue = 10000;
                 }
                 else
                 {
                     InvincibleFlag = true;
                     Time.HitStop();
                     Camera.Shake(5, 1, 0.95f);
+                    ShakeValue = 5;
                 }
             }
 
@@ -108,14 +126,16 @@ namespace Nov2019.GameObjects
             if (!DeathFlag)
             {
                 shotTime += Time.deltaTime;
-                if (Input.IsLeftMouseHold() || Input.GetRightTriggerButton(0) >= 0.5f)
+                if (Input.IsLeftMouseHold() || Input.GetRightTriggerButton(0) >= 0.5f || Input.IsPadButtonHold(Buttons.RightShoulder, 0))
                 {
                     if (shotTime >= shotLimit)
                     {
                         shotTime = 0;
 
+                        ShakeValue = 0.5f;
+
                         Random rand = GameDevice.Instance().Random;
-                        GameDevice.Instance().Sound.PlaySE("PlayerShot0" + rand.Next(1,5).ToString());
+                        GameDevice.Instance().Sound.PlaySE("PlayerShot0" + rand.Next(1, 5).ToString());
 
                         Vector2 a = MyMath.DegToVec2(MyMath.Vec2ToDeg(new Vector2(AngleVec3.Z, AngleVec3.X)) + 90f);
                         Vector3 i = new Vector3(a.Y, 0, a.X);
@@ -127,11 +147,6 @@ namespace Nov2019.GameObjects
                 {
                     shotTime = 0;
                 }
-            }
-
-            if (deathTime >= deathLimit)
-            {
-
             }
         }
 
@@ -167,6 +182,11 @@ namespace Nov2019.GameObjects
             SpriteFont font = Fonts.FontCica_32;
             string text;
             Vector2 size;
+
+            if (!GAMESTART_FLAG)
+            {
+                renderer.Draw2D("SPACEPUSH_TO_START", Screen.Vec2 / 2f + Vector2.UnitY * 200 * Screen.ScreenSize, Color.White, 0, new Vector2(304, 72), Vector2.One * 1 * Screen.ScreenSize);
+            }
 
             for (int i = 0; i < MAX_HITPOINT; i++)
             {
@@ -208,6 +228,7 @@ namespace Nov2019.GameObjects
                     DeathFlag = true;
                     Time.PlayerDeathStopTime();
                     Camera.Shake(5, 3, 0.96f);
+                    ShakeValue = 50;
                 }
                 else
                 {
@@ -215,6 +236,7 @@ namespace Nov2019.GameObjects
                     InvincibleFlag = true;
                     Time.HitStop();
                     Camera.Shake(5, 1, 0.95f);
+                    ShakeValue = 5;
                 }
             }
         }
@@ -279,7 +301,7 @@ namespace Nov2019.GameObjects
 
 
             // 右クリック押してるか
-            PlayerAimMode = (Input.IsRightMouseHold() || Input.GetLeftTriggerButton(0) >= 0.5f) && !DeathFlag;
+            PlayerAimMode = (Input.IsRightMouseHold() || Input.GetLeftTriggerButton(0) >= 0.5f) || Input.IsPadButtonHold(Buttons.LeftShoulder, 0) && !DeathFlag;
 
             if (!DeathFlag)
             {

@@ -40,7 +40,7 @@ namespace Nov2019.GameObjects
 
         // 最初の待機状態の変数
         float waitTime;
-        static readonly float waitLimit = 2.5f;
+        static readonly float waitLimit = 6f;
         public bool isWait { get; private set; }
         bool isHeal;    // 回復状態か
 
@@ -103,7 +103,7 @@ namespace Nov2019.GameObjects
         public override void Initialize()
         {
             CurrentRootPos = uint.MaxValue;
-            Position = new Vector3(0, 0, -500);
+            Position = new Vector3(0, 0, -1000);
             BossState = BossStateEnum.Stage01;
             AttackModules.Clear();
             MoveModule = new None_MM(this);
@@ -129,7 +129,8 @@ namespace Nov2019.GameObjects
             offsetDestScale = 0;
             offsetScale = 0;
             DestAngle = 0;
-            Angle = 0;
+            Angle = 180;
+            DestAngle = 180;
             fireTime = 0;
             DestVelocity = Vector3.Zero;
             waitTime = 0;
@@ -359,7 +360,7 @@ namespace Nov2019.GameObjects
         {
             if (isHeal)
             {
-                BossHP += 0.01f * Time.deltaSpeed;
+                BossHP += 0.005f * Time.deltaSpeed;
             }
             else
             {
@@ -444,7 +445,8 @@ namespace Nov2019.GameObjects
                     isWait = false;
                     waitTime = 0;
                     AttackModules.Add(new CircleMine_AM(this));
-                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 50, 20));
+                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 15));
+                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 20));
                     MoveModule = new CircleRandom_MM(this);
                     if (!initBGMFlag)
                     {
@@ -471,7 +473,9 @@ namespace Nov2019.GameObjects
                     isWait = false;
                     waitTime = 0;
                     AttackModules.Add(new CircleMine_AM(this));
-                    AttackModules.Add(new CrossMine_AM(this, 0.025f, 30, 15));
+                    AttackModules.Add(new CrossMine_AM(this, 0.025f, 30, 15,90,0.5f));
+                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 30));
+                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 15));
                     MoveModule = new CircleRandom_MM(this);
                 }
             }
@@ -493,7 +497,11 @@ namespace Nov2019.GameObjects
                     isWait = false;
                     waitTime = 0;
                     AttackModules.Add(new CircleMine_AM(this));
-                    AttackModules.Add(new CrossMine_AM(this, 0.25f, 30, 10));
+                    AttackModules.Add(new CrossMine_AM(this, 0.025f, 20, 15, 90, 1f));
+                    AttackModules.Add(new CrossMine_AM(this, 0.025f, 20, 15, 45, 1f));
+                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 30));
+                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 15));
+                    AttackModules.Add(new Missile_AM(this, 0.1f, 5, 15));
                     MoveModule = new CircleRandom_MM(this);
                 }
             }

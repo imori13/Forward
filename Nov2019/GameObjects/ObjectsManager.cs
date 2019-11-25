@@ -15,7 +15,7 @@ namespace Nov2019.GameObjects
         // 当たり判定だけ行う
         public List<GameObject>[] Array = new List<GameObject>[85];
         // オブジェクトを更新する
-        private List<GameObject> gameobjects = new List<GameObject>();
+        public List<GameObject> gameobjects { get; private set; } = new List<GameObject>();
         private List<Particle> particles = new List<Particle>();
 
         private List<GameObject> addGameObjects = new List<GameObject>();
@@ -58,7 +58,7 @@ namespace Nov2019.GameObjects
         public void AddGameObject(GameObject gameobject, bool offsetFlag)
         {
             if (gameobject == null) { return; }
-            
+
             gameobject.ObjectsManager = this;
             gameobject.Camera = Camera;
             gameobject.Initialize();
@@ -173,7 +173,7 @@ namespace Nov2019.GameObjects
 
                     for (int i = 0; i < 2; i++)
                     {
-                        AddParticle(new Spark_Particle3D(g.Position, MyMath.RandomCircleVec3(), MyMath.RandF(0,30), GameDevice.Instance().Random));
+                        AddParticle(new Spark_Particle3D(g.Position, MyMath.RandomCircleVec3(), MyMath.RandF(0, 30), GameDevice.Instance().Random));
                     }
                 }
             });

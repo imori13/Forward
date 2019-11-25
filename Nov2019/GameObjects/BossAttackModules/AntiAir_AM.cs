@@ -18,13 +18,6 @@ namespace Nov2019.GameObjects.BossAttackModules
 
         public override void Attack()
         {
-            //if (Vector3.DistanceSquared(BossEnemy.Position, ObjectsManager.Player.Position) <= 500 * 500)
-            //{
-            //    Initialize();
-
-            //    return;
-            //}
-
             base.Attack();
         }
 

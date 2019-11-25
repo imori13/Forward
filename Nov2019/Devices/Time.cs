@@ -26,6 +26,7 @@ namespace Nov2019.Devices
         public static float bossBreakStopTime { get; private set; }
         public static readonly float bossBreakStopLimit = 4f;
         public static bool PlayerDeathStopMode { get; private set; }
+        public static bool TitleStopMode { get; set; }
 
         public static void Initialize()
         {
@@ -43,6 +44,7 @@ namespace Nov2019.Devices
         {
             dest = (Input.GetKey(Keys.T)) ? (0.2f) : (1.00f);
 
+            dest = (TitleStopMode) ? (0) : (dest);
             
             if (TimeStopMode)
             {

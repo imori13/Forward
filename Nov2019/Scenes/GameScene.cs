@@ -67,6 +67,8 @@ namespace Nov2019.Scenes
             textAlpha = 1;
             color = new Color(100, 100, 100);
 
+            GameDevice.Instance().Sound.StopBGM();
+
             base.Initialize();
         }
 
@@ -78,9 +80,14 @@ namespace Nov2019.Scenes
 
             frameCounter.Update(GameDevice.Instance().GameTime);
 
+            if (Input.GetKeyDown(Keys.D1))
+            {
+                IsEndFlag = true;
+            }
+
             if (BossEnemy.GAMECLAER_FLAG || Player.DeathFlag)
             {
-                if (Input.GetKey(Keys.Space))
+                if (Input.GetKey(Keys.Space) || Input.IsPadButtonHold(Buttons.A, 0) || Input.IsPadButtonHold(Buttons.B, 0))
                 {
                     inputTime += (float)GameDevice.Instance().GameTime.ElapsedGameTime.TotalSeconds;
                     if (inputTime >= inputLImit)
@@ -119,6 +126,43 @@ namespace Nov2019.Scenes
             ObjectsManager.Draw(renderer);
 
             renderer.Begin2D();
+
+            // ミニマップ
+            Vector2 miniMapPos = new Vector2(200 * Screen.ScreenSize, Screen.HEIGHT - 200 * Screen.ScreenSize);
+            renderer.Draw2D("Pixel", miniMapPos, new Color(100, 100, 100) * 0.3f, 0, Vector2.One * 0.5f, Vector2.One * 300 * Screen.ScreenSize);
+            renderer.Draw2D("Pixel", miniMapPos, new Color(50, 50, 50) * 0.3f, 0, Vector2.One * 0.5f, Vector2.One * 280 * Screen.ScreenSize);
+            foreach (var gameobj in ObjectsManager.gameobjects)
+            {
+                Color color = Color.Black;
+                if (gameobj is Star || gameobj.GameObjectTag == GameObjectTag.Player || gameobj.GameObjectTag == GameObjectTag.BossEnemy) { continue; }
+                else if (gameobj.GameObjectTag == GameObjectTag.EnemyBullet) { color = Color.White; }
+                else if (gameobj.GameObjectTag == GameObjectTag.PlayerBullet) { color = new Color(200, 230, 255); }
+                else if (gameobj.GameObjectTag == GameObjectTag.DamageCollision) { color = Color.DarkRed; }
+
+                Vector3 vec3 = (gameobj.Position - ObjectsManager.OffsetPosition) / 20;
+                Vector2 pos = miniMapPos + new Vector2(vec3.X, vec3.Z);
+                renderer.Draw2D("Pixel", pos, color, 0, Vector2.One * 0.5f, Vector2.One * 2 * Screen.ScreenSize);
+            }
+
+            Vector3 vvec3 = Vector3.Zero;
+            Vector2 ppos = Vector2.Zero;
+            vvec3 = (ObjectsManager.BossEnemy.Position - ObjectsManager.OffsetPosition) / 20;
+            ppos = miniMapPos + new Vector2(vvec3.X, vvec3.Z);
+            renderer.Draw2D("Pixel", ppos, Color.Red, MathHelper.ToRadians(ObjectsManager.BossEnemy.Angle), Vector2.One * 0.5f, Vector2.One * 5 * Screen.ScreenSize);
+
+            vvec3 = (ObjectsManager.Player.Position - ObjectsManager.OffsetPosition) / 20;
+            ppos = miniMapPos + new Vector2(vvec3.X, vvec3.Z);
+            renderer.Draw2D("Pixel", ppos, Color.SkyBlue, MathHelper.ToRadians(ObjectsManager.Player.Angle), Vector2.One * 0.5f, Vector2.One * 5 * Screen.ScreenSize);
+
+            // ---------------------
+
+            renderer.Draw2D("LbuttonUI", new Vector2(Screen.WIDTH - 25 * Screen.ScreenSize, 40 * Screen.ScreenSize), Color.White, 0, new Vector2(448, 28), Vector2.One * 0.5f * Screen.ScreenSize);
+            renderer.Draw2D("RbuttonUI", new Vector2(Screen.WIDTH - 25 * Screen.ScreenSize, 80 * Screen.ScreenSize), Color.White, 0, new Vector2(400, 28), Vector2.One * 0.5f * Screen.ScreenSize);
+            renderer.Draw2D("LStickUI", new Vector2(Screen.WIDTH - 25 * Screen.ScreenSize, 120 * Screen.ScreenSize), Color.White, 0, new Vector2(488, 32), Vector2.One * 0.5f * Screen.ScreenSize);
+            renderer.Draw2D("RStickUI", new Vector2(Screen.WIDTH - 25 * Screen.ScreenSize, 160 * Screen.ScreenSize), Color.White, 0, new Vector2(528, 32), Vector2.One * 0.5f * Screen.ScreenSize);
+
+            // ---------------------
+
             ObjectsManager.DrawUI(renderer);
 
             SpriteFont font = Fonts.FontCica_32;
@@ -154,9 +198,8 @@ namespace Nov2019.Scenes
                 {
                     renderer.Draw2D("GAMEOVER_TEXT", Screen.Vec2 / 2f - Vector2.UnitY * 100 * Screen.ScreenSize, Color.White * textAlpha, 0, new Vector2(240, 30), Vector2.One * 1.5f * Screen.ScreenSize);
                 }
-                renderer.Draw2D("SPACEHOLD_TO_RETURN_TEXT", Screen.Vec2 / 2f + Vector2.UnitY * 200 * Screen.ScreenSize, Color.White * textAlpha, 0, new Vector2(330, 35), Vector2.One * 0.5f * Screen.ScreenSize);
+                renderer.Draw2D("SPACEHOLD_TO_RETURN_TEXT", Screen.Vec2 / 2f + Vector2.UnitY * 200 * Screen.ScreenSize, Color.White * textAlpha, 0, new Vector2(350, 100), Vector2.One * 0.5f * Screen.ScreenSize);
             }
-
 
             renderer.End();
 

@@ -13,7 +13,7 @@ namespace Nov2019.GameObjects.BossAttackModules
     {
         static int count = 360 / 5;
 
-        public CircleMine_AM(BossEnemy BossEnemy) : base(BossEnemy, "Mine_icon", 0.05f, count, 30)
+        public CircleMine_AM(BossEnemy BossEnemy) : base(BossEnemy, "Mine_icon", 0.001f, count, 30, false)
         {
 
         }
@@ -22,7 +22,7 @@ namespace Nov2019.GameObjects.BossAttackModules
         {
             Random rand = GameDevice.Instance().Random;
 
-            Vector2 vec2 = MyMath.DegToVec2(Count*5);
+            Vector2 vec2 = MyMath.DegToVec2(Count * 5);
             float randY = MyMath.RandF(-1, 1) * 0.1f;
             Vector3 vec3 = new Vector3(vec2.Y, randY, vec2.X);
             ObjectsManager.AddGameObject(new Mine_Bullet(BossEnemy.Position, vec3, rand.Next(50, 100) * 0.1f), false);

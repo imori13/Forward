@@ -26,7 +26,7 @@ namespace Nov2019.GameObjects.BossAttackModules
         float time;
         float limit = 0.01f;
 
-        public AttackModule(BossEnemy BossEnemy,string assetName, float shotLimit, int countLimit, float coolTimeLimit)
+        public AttackModule(BossEnemy BossEnemy, string assetName, float shotLimit, int countLimit, float coolTimeLimit, bool initFlag = true)
         {
             this.BossEnemy = BossEnemy;
             ObjectsManager = BossEnemy.ObjectsManager;
@@ -34,6 +34,11 @@ namespace Nov2019.GameObjects.BossAttackModules
             CountLimit = countLimit;
             CoolTimeLimit = coolTimeLimit;
             AssetName = assetName;
+            if (initFlag)
+            {
+                Initialize();
+                CoolTime = MyMath.RandF(CoolTimeLimit);
+            }
         }
 
         public void Initialize()

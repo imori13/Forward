@@ -67,7 +67,8 @@ namespace Nov2019.Devices
             rotationX = Matrix.CreateRotationX(0);
             rotationY = Matrix.CreateRotationY(0);
 
-            destCameraPosLongitude = 0;
+            destCameraPosLatitude = 5;
+            destCameraPosLongitude = 90;
         }
 
         public void Update(Player player)
@@ -181,6 +182,7 @@ namespace Nov2019.Devices
                 float magnitude = shakeMagnitude * (1f - (progress * progress));
 
                 shakeOffset = new Vector3(NextFloat(), NextFloat(), NextFloat()) * magnitude;
+
 
                 Position += shakeOffset;
                 cameraview_viewpoint += shakeOffset;
