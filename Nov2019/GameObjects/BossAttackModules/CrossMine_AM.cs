@@ -11,15 +11,17 @@ namespace Nov2019.GameObjects.BossAttackModules
 {
     class CrossMine_AM : AttackModule
     {
+        float randDeg;
         float initBossAngle;
         int deg;
         float distanceRate;
 
-        public CrossMine_AM(BossEnemy BossEnemy,float shotLimit,int countLimit,float waitLimit,int deg,float distanceRate) : base(BossEnemy, "Mine_icon", shotLimit, countLimit, waitLimit)
+        public CrossMine_AM(BossEnemy BossEnemy, float shotLimit, int countLimit, float waitLimit, int deg, float distanceRate) : base(BossEnemy, "Mine_icon", shotLimit, countLimit, waitLimit)
         {
             initBossAngle = BossEnemy.Angle;
             this.deg = deg;
             this.distanceRate = distanceRate;
+            randDeg = MyMath.RandF(360);
         }
 
         public override void Shot()
@@ -28,7 +30,7 @@ namespace Nov2019.GameObjects.BossAttackModules
 
             for (int i = 0; i < 360; i += deg)
             {
-                Vector2 vec2 = MyMath.DegToVec2(i + initBossAngle);
+                Vector2 vec2 = MyMath.DegToVec2(i + initBossAngle + randDeg);
                 float randY = MyMath.RandF(-1, 1) * 0.01f;
                 Vector3 vec3 = new Vector3(vec2.Y, randY, vec2.X);
                 ObjectsManager.AddGameObject(new Mine_Bullet(BossEnemy.Position, vec3, 5 * (Count * distanceRate) * 0.25f), false);

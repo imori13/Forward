@@ -445,7 +445,7 @@ namespace Nov2019.GameObjects
                     isWait = false;
                     waitTime = 0;
                     AttackModules.Add(new CircleMine_AM(this));
-                    AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 15));
+                    AttackModules.Add(new Missile_AM(this, 0.1f, 5, 15));
                     AttackModules.Add(new AntiAir_AM(this, 0.1f, 10, 20));
                     MoveModule = new CircleRandom_MM(this);
                     if (!initBGMFlag)
