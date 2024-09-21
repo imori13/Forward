@@ -20,7 +20,7 @@ namespace Nov2019
             Content.RootDirectory = "Content";
 
             // フルスクリーンのオンオフを設定
-            graphics.IsFullScreen = true;
+            graphics.IsFullScreen = false;
             // フルスクリーンモードから画面を切り替えると実行中のまま消えるアレをなくす処理
             graphics.HardwareModeSwitch = false;
             // DrawメソッドをモニタのVerticalRetraceと同期しない
